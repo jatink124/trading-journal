@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nifty Master Journal (Multi-Select)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Layout */
+        .container { display: flex; width: 100%; gap: 20px; }
+
+        .input-panel {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .journal-feed {
+            flex: 2;
+            background: #151e2e;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;}
+        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; margin-top: 10px; }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 6px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        textarea { resize: vertical; min-height: 80px; }
+        input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+        /* MODE SWITCHER TABS */
+        .mode-tabs {
+            display: flex;
+            background: #0f172a;
+            padding: 5px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .mode-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .mode-tab.active { background: var(--accent); color: white; }
+        .mode-tab.active-eod { background: var(--purple); color: white; }
+
+        /* MULTI-SELECT CHIPS STYLING */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .chip {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: 0.2s;
+            user-select: none;
+        }
+        .chip:hover { border-color: var(--danger); color: white; }
+        /* Selected State */
+        .chip.selected {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger);
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        /* Icon Button */
+        .select-wrapper { display: flex; gap: 10px; align-items: flex-start; }
+        .btn-icon {
+            background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted);
+            width: 42px; height: 42px; padding: 0; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 10px; cursor: pointer;
+        }
+        .btn-icon:hover { background: var(--border); color: white; }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--border); border-radius: 6px; padding: 20px;
+            text-align: center; cursor: pointer; transition: 0.2s; margin-bottom: 15px;
+        }
+        .drop-zone:hover { border-color: var(--accent); background: #1e3a8a33; }
+        .drop-zone p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Buttons */
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
+        button {
+            background: var(--accent); color: white; border: none; padding: 12px;
+            border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; width: 100%;
+        }
+        button:hover { filter: brightness(1.1); }
+        
+        .btn-primary { grid-column: span 2; margin-bottom: 10px; }
+        .btn-eod { background: var(--purple); grid-column: span 2; margin-bottom: 10px; }
+        .btn-cancel { background: var(--border); color: var(--text-muted); grid-column: span 2; display: none; margin-bottom: 20px; }
+        
+        .btn-export { background: var(--success); }
+        .btn-import { background: var(--warning); color: #0f172a; }
+        .btn-clear { background: var(--danger); grid-column: span 2; }
+
+        /* Journal Entries */
+        .entry-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 8px; padding: 15px; animation: fadeIn 0.3s ease; position: relative;
+        }
+        .entry-card.eod-card { border-left: 4px solid var(--purple); background: #1a1625; }
+        
+        .entry-header {
+            display: flex; justify-content: space-between; margin-bottom: 10px;
+            border-bottom: 1px solid var(--border); padding-bottom: 8px;
+        }
+
+        .crud-actions i {
+            margin-left: 10px; cursor: pointer; color: var(--text-muted); transition: 0.2s;
+        }
+        .crud-actions i.fa-edit:hover { color: var(--warning); }
+        .crud-actions i.fa-trash:hover { color: var(--danger); }
+        
+        .timestamp { color: var(--accent); font-weight: bold; font-size: 0.9rem; }
+        .tag { padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; background: #334155; }
+        .tag-neg { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); margin-right: 5px; margin-bottom: 5px; display: inline-block; }
+        .tag-plan { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+
+        .entry-img { max-width: 100%; border-radius: 4px; margin-top: 10px; border: 1px solid var(--border); cursor: zoom-in; }
+        
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); }}
+
+        /* Modals */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: var(--card-bg); padding: 20px; border-radius: 12px; width: 400px;
+            border: 1px solid var(--border); max-height: 80vh; display: flex; flex-direction: column;
+        }
+        .tag-list { overflow-y: auto; flex-grow: 1; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 6px; background: #0f172a; }
+        .tag-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="input-panel">
+        
+        <div class="mode-tabs">
+            <div class="mode-tab active" id="tabLive" onclick="switchMode('live')">⚡ Live Log</div>
+            <div class="mode-tab" id="tabEOD" onclick="switchMode('eod')">📝 EOD Review</div>
+        </div>
+
+        <div id="formLive">
+            <h2>Micro Observation</h2>
+            <label>Focus Area</label>
+            <div class="select-wrapper">
+                <select id="focusArea"></select>
+                <button class="btn-icon" onclick="openTagManager()"><i class="fas fa-cog"></i></button>
+            </div>
+            
+            <label>Notes</label>
+            <textarea id="liveNotes" placeholder="Minute detail: Nifty broke low, volume low..."></textarea>
+        </div>
+
+        <div id="formEOD" style="display: none;">
+            <h2 style="color: var(--purple);">Daily Review & Plan</h2>
+            
+            <label style="color: var(--danger);">🛑 Today's Negatives / Mistakes (Select All That Apply)</label>
+            <div class="chip-container" id="mistakeContainer">
+                <div class="chip" onclick="toggleChip(this)">FOMO / Early</div>
+                <div class="chip" onclick="toggleChip(this)">Overtrading</div>
+                <div class="chip" onclick="toggleChip(this)">Revenge Trading</div>
+                <div class="chip" onclick="toggleChip(this)">Sizing Issue</div>
+                <div class="chip" onclick="toggleChip(this)">No Plan</div>
+                <div class="chip" onclick="toggleChip(this)">Hesitation</div>
+                <div class="chip" onclick="toggleChip(this)">Cut Winner Early</div>
+                <div class="chip" onclick="toggleChip(this)">Held Loser Long</div>
+            </div>
+
+            <textarea id="negativesNotes" placeholder="Explain the mistakes (if any)..."></textarea>
+
+            <label style="color: var(--success);">🚀 Tomorrow's Plan</label>
+            <div class="input-row">
+                <div>
+                    <label>Bias</label>
+                    <select id="planBias">
+                        <option value="Neutral">Neutral</option>
+                        <option value="Bullish">Bullish 🐂</option>
+                        <option value="Bearish">Bearish 🐻</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Key Level</label>
+                    <input type="text" id="keyLevel" placeholder="e.g. 25800">
+                </div>
+            </div>
+            <textarea id="planNotes" placeholder="If gap up above 25800, wait for retest..."></textarea>
+        </div>
+
+        <label>Screenshot Evidence</label>
+        <div class="drop-zone" id="dropZone">
+            <p>Click to Paste or Drop Screenshot</p>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+        <div id="previewContainer" style="display:none; margin-bottom:15px;">
+            <img id="previewImg" style="max-height: 100px; border-radius:4px;">
+            <button onclick="clearImage()" style="padding:4px 8px; background:var(--danger); width:auto; border:none; color:white;">Remove</button>
+        </div>
+
+        <button id="btnSubmit" class="btn-primary" onclick="addEntry()">Add Live Entry</button>
+        <button id="btnCancel" class="btn-cancel" onclick="cancelEdit()">Cancel Edit</button>
+        
+        <div style="flex-grow: 1;"></div>
+        
+        <div class="btn-group">
+            <button class="btn-export" onclick="downloadData()">Download</button>
+            <button class="btn-import" onclick="document.getElementById('importFile').click()">Import</button>
+            <button class="btn-clear" onclick="clearData()">Clear All</button>
+        </div>
+        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(this)">
+    </div>
+
+    <div class="journal-feed" id="journalFeed"></div>
+</div>
+
+<div class="modal" id="imgModal" onclick="this.style.display='none'">
+    <img id="modalImg" style="max-width:90%; max-height:90%;">
+</div>
+
+<div class="modal" id="tagModal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between;">
+            <h3>Manage Focus Areas</h3>
+            <span onclick="document.getElementById('tagModal').style.display='none'" style="cursor:pointer; font-size:1.5rem;">&times;</span>
+        </div>
+        <div class="tag-list" id="tagListDisplay"></div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="newTagInput" placeholder="New Area...">
+            <button onclick="addNewTag()" style="width:auto;">Add</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DATA STATE ---
+    let entries = JSON.parse(localStorage.getItem('tradingJournal')) || [];
+    let currentImageBase64 = null;
+    let currentMode = 'live'; 
+    let editingId = null; 
+    
+    const defaultAreas = ["Price Action", "Option Premiums", "Volume", "Support/Resistance"];
+    let focusAreas = JSON.parse(localStorage.getItem('journalFocusAreas')) || defaultAreas;
+
+    // --- INIT ---
+    renderEntries();
+    renderFocusOptions();
+
+    // --- CHIP TOGGLE LOGIC ---
+    function toggleChip(chip) {
+        chip.classList.toggle('selected');
+    }
+
+    function getSelectedMistakes() {
+        const selected = document.querySelectorAll('.chip.selected');
+        return Array.from(selected).map(c => c.innerText);
+    }
+
+    function setSelectedMistakes(mistakesArray) {
+        // Reset all first
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        // Select matches
+        if(mistakesArray && Array.isArray(mistakesArray)) {
+            document.querySelectorAll('.chip').forEach(c => {
+                if(mistakesArray.includes(c.innerText)) {
+                    c.classList.add('selected');
+                }
+            });
+        }
+    }
+
+    // --- MODE SWITCHER ---
+    function switchMode(mode) {
+        currentMode = mode;
+        const btn = document.getElementById('btnSubmit');
+        
+        if(mode === 'live') {
+            document.getElementById('formLive').style.display = 'block';
+            document.getElementById('formEOD').style.display = 'none';
+            document.getElementById('tabLive').className = 'mode-tab active';
+            document.getElementById('tabEOD').className = 'mode-tab';
+            
+            if(editingId) {
+                btn.innerText = "Update Entry";
+                btn.className = "btn-warning";
+                btn.style.background = "#f59e0b"; btn.style.color = "#000";
+            } else {
+                btn.innerText = "Add Live Entry";
+                btn.className = "btn-primary";
+                btn.style.background = ""; btn.style.color = "";
+            }
+        } else {
+            document.getElementById('formLive').style.display = 'none';
+            document.getElementById('formEOD').style.display = 'block';
+            document.getElementById('tabLive').className = 'mode-tab';
+            document.getElementById('tabEOD').className = 'mode-tab active-eod';
+            if(editingId) {
+                btn.innerText = "Update Entry";
+                btn.className = "btn-warning";
+                btn.style.background = "#f59e0b"; btn.style.color = "#000";
+            } else {
+                btn.innerText = "Save Daily Review";
+                btn.className = "btn-eod";
+                btn.style.background = ""; btn.style.color = "";
+            }
+        }
+    }
+
+    // --- CORE CRUD LOGIC ---
+    function addEntry() {
+        let entryData = {};
+
+        if(currentMode === 'live') {
+            const area = document.getElementById('focusArea').value;
+            const notes = document.getElementById('liveNotes').value;
+            if(!notes && !currentImageBase64) return alert("Empty entry!");
+            
+            entryData = { type: 'live', area, notes, image: currentImageBase64 };
+        } else {
+            // NEW: Get Multi-Select Values
+            const mistakes = getSelectedMistakes();
+            
+            const negNotes = document.getElementById('negativesNotes').value;
+            const bias = document.getElementById('planBias').value;
+            const level = document.getElementById('keyLevel').value;
+            const planNotes = document.getElementById('planNotes').value;
+
+            if(!negNotes && !planNotes && mistakes.length === 0) return alert("Please fill out the review!");
+
+            entryData = {
+                type: 'eod',
+                mistakes: mistakes, // Store array
+                negNotes, bias, level, planNotes,
+                image: currentImageBase64
+            };
+        }
+
+        if(editingId) {
+            const index = entries.findIndex(e => e.id === editingId);
+            if(index !== -1) entries[index] = { ...entries[index], ...entryData };
+            cancelEdit();
+        } else {
+            entryData.id = Date.now();
+            entryData.timestamp = new Date().toLocaleTimeString();
+            if(currentMode === 'eod') entryData.timestamp = new Date().toLocaleDateString() + " (EOD)";
+            entries.unshift(entryData);
+        }
+
+        saveData();
+        renderEntries();
+        resetForms();
+    }
+
+    function renderEntries() {
+        const feed = document.getElementById('journalFeed');
+        if (entries.length === 0) {
+            feed.innerHTML = '<h2 style="color:var(--text-muted); text-align:center; margin-top:50px;">Journal Empty</h2>';
+            return;
+        }
+        
+        feed.innerHTML = entries.map(entry => {
+            const crudIcons = `
+                <div class="crud-actions">
+                    <i class="fas fa-edit" onclick="editEntry(${entry.id})" title="Edit"></i>
+                    <i class="fas fa-trash" onclick="deleteEntry(${entry.id})" title="Delete"></i>
+                </div>
+            `;
+
+            if(entry.type === 'eod') {
+                // Render Tags for Mistakes
+                const mistakeTags = (entry.mistakes && entry.mistakes.length > 0) 
+                    ? entry.mistakes.map(m => `<span class="tag tag-neg">${m}</span>`).join('') 
+                    : '<span style="color:#64748b; font-size:0.8rem;">No Mistakes Selected</span>';
+
+                return `
+                <div class="entry-card eod-card">
+                    <div class="entry-header">
+                        <span class="timestamp" style="color:var(--purple);">${entry.timestamp}</span>
+                        <div style="display:flex; align-items:center;">
+                            <span class="tag tag-plan">DAILY REVIEW</span>
+                            ${crudIcons}
+                        </div>
+                    </div>
+                    <div style="margin-bottom:10px; border-bottom:1px solid #334155; padding-bottom:10px;">
+                        <div style="margin-bottom:8px;">${mistakeTags}</div>
+                        <p style="margin-top:5px; color:#cbd5e1;">${entry.negNotes || 'No additional notes.'}</p>
+                    </div>
+                    <div>
+                        <div style="color:var(--success); font-weight:bold; font-size:0.9rem;">
+                            🎯 PLAN: <span style="color:white;">${entry.bias}</span> | Key Lvl: <span style="color:white;">${entry.level}</span>
+                        </div>
+                        <p style="margin-top:5px; color:#cbd5e1;">${entry.planNotes || 'No plan.'}</p>
+                    </div>
+                    ${entry.image ? `<img src="${entry.image}" class="entry-img" onclick="openModal('${entry.image}')">` : ''}
+                </div>`;
+            } else {
+                return `
+                <div class="entry-card">
+                    <div class="entry-header">
+                        <span class="timestamp">${entry.timestamp}</span>
+                        <div style="display:flex; align-items:center;">
+                            <span class="tag">${entry.area}</span>
+                            ${crudIcons}
+                        </div>
+                    </div>
+                    <p>${entry.notes}</p>
+                    ${entry.image ? `<img src="${entry.image}" class="entry-img" onclick="openModal('${entry.image}')">` : ''}
+                </div>`;
+            }
+        }).join('');
+    }
+
+    function editEntry(id) {
+        const entry = entries.find(e => e.id === id);
+        if(!entry) return;
+
+        editingId = id;
+        document.getElementById('btnCancel').style.display = 'block';
+
+        currentImageBase64 = entry.image || null;
+        if(currentImageBase64) {
+            document.getElementById('previewImg').src = currentImageBase64;
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('dropZone').style.display = 'none';
+        } else {
+            clearImage();
+        }
+
+        switchMode(entry.type);
+
+        if(entry.type === 'live') {
+            document.getElementById('focusArea').value = entry.area;
+            document.getElementById('liveNotes').value = entry.notes;
+        } else {
+            // NEW: Set Multi-Select Chips
+            setSelectedMistakes(entry.mistakes || []);
+            
+            document.getElementById('negativesNotes').value = entry.negNotes;
+            document.getElementById('planBias').value = entry.bias;
+            document.getElementById('keyLevel').value = entry.level;
+            document.getElementById('planNotes').value = entry.planNotes;
+        }
+        document.querySelector('.input-panel').scrollTop = 0;
+    }
+
+    function cancelEdit() {
+        editingId = null;
+        document.getElementById('btnCancel').style.display = 'none';
+        resetForms();
+        switchMode(currentMode);
+    }
+
+    function deleteEntry(id) {
+        if(confirm("Delete this entry?")) {
+            entries = entries.filter(e => e.id !== id);
+            saveData();
+            renderEntries();
+            if(editingId === id) cancelEdit();
+        }
+    }
+
+    function resetForms() {
+        document.getElementById('liveNotes').value = '';
+        document.getElementById('negativesNotes').value = '';
+        document.getElementById('keyLevel').value = '';
+        document.getElementById('planNotes').value = '';
+        // Clear selection
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        clearImage();
+    }
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.onclick = () => fileInput.click();
+    document.onpaste = (e) => {
+        const item = (e.clipboardData || e.originalEvent.clipboardData).items[0];
+        if (item.type.indexOf('image') !== -1) processFile(item.getAsFile());
+    };
+    fileInput.onchange = (e) => { if(e.target.files[0]) processFile(e.target.files[0]); };
+
+    function processFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            currentImageBase64 = e.target.result;
+            document.getElementById('previewImg').src = currentImageBase64;
+            document.getElementById('previewContainer').style.display = 'block';
+            dropZone.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+    function clearImage() {
+        currentImageBase64 = null;
+        document.getElementById('previewContainer').style.display = 'none';
+        dropZone.style.display = 'block';
+        fileInput.value = '';
+    }
+
+    // --- TAG MANAGER ---
+    function renderFocusOptions() {
+        const sel = document.getElementById('focusArea');
+        sel.innerHTML = focusAreas.map(a => `<option value="${a}">${a}</option>`).join('');
+    }
+    function openTagManager() {
+        renderTagList();
+        document.getElementById('tagModal').style.display = 'flex';
+    }
+    function renderTagList() {
+        document.getElementById('tagListDisplay').innerHTML = focusAreas.map((a, i) => `
+            <div class="tag-item"><span>${a}</span> <i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="deleteTag(${i})"></i></div>
+        `).join('');
+    }
+    function addNewTag() {
+        const val = document.getElementById('newTagInput').value.trim();
+        if(val && !focusAreas.includes(val)) {
+            focusAreas.push(val);
+            localStorage.setItem('journalFocusAreas', JSON.stringify(focusAreas));
+            renderTagList(); renderFocusOptions();
+            document.getElementById('newTagInput').value = '';
+        }
+    }
+    function deleteTag(i) {
+        focusAreas.splice(i, 1);
+        localStorage.setItem('journalFocusAreas', JSON.stringify(focusAreas));
+        renderTagList(); renderFocusOptions();
+    }
+
+    function saveData() { localStorage.setItem('tradingJournal', JSON.stringify(entries)); }
+    function clearData() { if(confirm("Clear all?")) { localStorage.removeItem('tradingJournal'); entries=[]; renderEntries(); } }
+    
+    function downloadData() {
+        const a = document.createElement('a');
+        a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(entries));
+        a.download = "journal_" + new Date().toISOString().slice(0,10) + ".json";
+        a.click();
+    }
+    
+    function importData(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const arr = JSON.parse(e.target.result);
+                arr.forEach(n => { if(!entries.some(e=>e.id===n.id)) entries.push(n); });
+                entries.sort((a,b)=>b.id-a.id);
+                saveData(); renderEntries();
+                alert("Imported!");
+            } catch(err) { alert("Invalid JSON"); }
+        };
+        reader.readAsText(file);
+    }
+    
+    function openModal(src) {
+        document.getElementById('modalImg').src = src;
+        document.getElementById('imgModal').style.display = 'flex';
+    }
+</script>
+</body>
+</html>
