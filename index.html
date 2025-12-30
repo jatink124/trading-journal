@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nifty Master Journal | Analytics View</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #e2e8f0; --text-muted: #94a3b8; 
+            --accent: #3b82f6; --accent-hover: #2563eb; --success: #10b981; --warning: #f59e0b; 
+            --danger: #ef4444; --purple: #8b5cf6; --cyan: #06b6d4; --border: #334155; 
+            --info-bg: #1e3a8a; --feed-bg: #0b1120; 
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; display: flex; gap: 20px; height: 100vh; box-sizing: border-box; }
+        .container { display: flex; width: 100%; gap: 20px; height: 100%; }
+        
+        /* --- INPUT PANEL (Left Side) --- */
+        .input-panel { flex: 1; background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; max-width: 400px; }
+        
+        /* --- ANALYTICAL FEED (Right Side) --- */
+        .journal-feed { flex: 2; background: var(--feed-bg); border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+        
+        .right-tabs-header { display: flex; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid var(--border); padding: 0 10px; }
+        .rt-tab { padding: 15px 15px; cursor: pointer; color: var(--text-muted); font-weight: 600; border-bottom: 3px solid transparent; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .rt-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .rt-tab.active-purple { color: var(--purple); border-bottom-color: var(--purple); }
+
+        .filter-bar { background: var(--card-bg); padding: 15px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 100px; }
+        .filter-bar input, .filter-bar select { margin-bottom: 0; font-size: 0.8rem; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; width: 100%; box-sizing: border-box;}
+
+        /* --- LAYOUT CONTROLS --- */
+        .layout-controls { display: flex; gap: 5px; background: #0f172a; padding: 4px; border-radius: 6px; border: 1px solid var(--border); height: 34px; box-sizing: border-box; align-items: center;}
+        .layout-btn { padding: 5px 10px; cursor: pointer; color: var(--text-muted); border-radius: 4px; transition: 0.2s; font-size: 0.9rem; display: flex; align-items: center; }
+        .layout-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .layout-btn.active { background: var(--accent); color: white; }
+
+        .right-content-area { flex: 1; overflow-y: auto; padding: 20px; position: relative; scrollbar-width: thin; }
+        
+        /* --- GRID SYSTEM FOR FEED --- */
+        .feed-grid { display: grid; gap: 15px; align-items: start; }
+        .feed-grid.layout-1 { grid-template-columns: 1fr; }
+        .feed-grid.layout-2 { grid-template-columns: 1fr 1fr; }
+        .feed-grid.layout-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+        /* Responsive Fallback */
+        @media (max-width: 1200px) { .feed-grid.layout-3 { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .feed-grid.layout-2, .feed-grid.layout-3 { grid-template-columns: 1fr; } }
+
+
+        /* --- CARD DESIGNS --- */
+        /* 1. Live Card */
+        .live-card {
+            display: flex; gap: 15px; background: #172033; 
+            padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent);
+            align-items: flex-start; height: 100%; box-sizing: border-box;
+        }
+        .live-time { min-width: 50px; font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+        .live-content { flex: 1; min-width: 0; }
+        .live-header { display: flex; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; gap: 5px; }
+        .live-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; white-space: nowrap;}
+        
+        /* 2. EOD Card */
+        .eod-card {
+            background: #1e293b; border: 1px solid var(--border); border-radius: 10px; 
+            overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); height: 100%; display: flex; flex-direction: column;
+        }
+        
+        .eod-header { 
+            padding: 10px 15px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .asset-title { font-size: 1.1rem; font-weight: bold; letter-spacing: 0.5px; }
+        .date-badge { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .eod-body { display: grid; grid-template-columns: 1.2fr 2fr; gap: 0; flex: 1; }
+        
+        /* Responsive internal card layout */
+        .feed-grid.layout-2 .eod-body, 
+        .feed-grid.layout-3 .eod-body { grid-template-columns: 1fr; } 
+        
+        .eod-meta { padding: 15px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
+        
+        /* Stack to Row in multi-view */
+        .feed-grid.layout-2 .eod-meta,
+        .feed-grid.layout-3 .eod-meta { flex-direction: row; border-right: none; border-bottom: 1px solid var(--border); padding: 10px; gap: 10px;}
+        .feed-grid.layout-2 .stat-box,
+        .feed-grid.layout-3 .stat-box { flex: 1; }
+
+        .stat-box { background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        .stat-value { font-size: 0.95rem; font-weight: 600; }
+        
+        .bias-bullish { color: var(--success); border-color: var(--success); }
+        .bias-bearish { color: var(--danger); border-color: var(--danger); }
+        .bias-neutral { color: var(--text-muted); }
+
+        .eod-analysis { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .mistake-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+        .mistake-pill { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        
+        .detail-text { font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; }
+        .plan-text { font-size: 0.9rem; color: var(--accent); font-style: italic; border-left: 2px solid var(--accent); padding-left: 10px; margin-top: 5px;}
+
+        .action-bar { padding: 8px 15px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 15px; }
+        .action-icon { cursor: pointer; font-size: 0.9rem; color: var(--text-muted); transition: 0.2s; }
+        .action-icon:hover { color: white; }
+        .action-icon.del:hover { color: var(--danger); }
+
+        .entry-gallery { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+        .entry-img { height: 60px; border-radius: 4px; border: 1px solid var(--border); cursor: zoom-in; object-fit: cover; transition: 0.2s; }
+        .entry-img:hover { opacity: 0.8; border-color: var(--accent); }
+
+        /* --- GLOBAL INPUTS --- */
+        h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;}
+        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.8rem; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
+        
+        .mode-tabs { display: flex; background: #0f172a; padding: 5px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .mode-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: 600; color: var(--text-muted); transition: 0.2s; }
+        .mode-tab.active { background: var(--accent); color: white; }
+        .mode-tab.active-eod { background: var(--purple); color: white; }
+        
+        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .chip { background: #0f172a; border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .chip.selected { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); color: var(--danger); }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        
+        /* --- GALLERY MODAL STYLES --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .gallery-container { position: relative; max-width: 95%; max-height: 95%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .gallery-img-full { max-width: 100%; max-height: 85vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        
+        .modal-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); color: white; border: none; padding: 15px; cursor: pointer; font-size: 1.5rem; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 1001; }
+        .modal-nav:hover { background: rgba(255,255,255,0.3); transform: translateY(-50%) scale(1.1); }
+        .nav-prev { left: -70px; } 
+        .nav-next { right: -70px; }
+        
+        /* Mobile adjust for arrows */
+        @media (max-width: 768px) {
+            .nav-prev { left: 10px; background: rgba(0,0,0,0.5); }
+            .nav-next { right: 10px; background: rgba(0,0,0,0.5); }
+        }
+
+        .modal-info { position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); text-align: center; width: 100%; }
+        .modal-counter { color: var(--text-muted); font-family: monospace; font-size: 1rem; }
+        .modal-desc { color: var(--accent); font-size: 0.9rem; margin-top: 4px; font-weight: 600; }
+        
+        .close-modal-btn { position: absolute; top: 20px; right: 20px; background: none; color: white; font-size: 2rem; cursor: pointer; z-index: 1002; opacity: 0.7; }
+        .close-modal-btn:hover { opacity: 1; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="input-panel">
+        <div class="mode-tabs">
+            <div class="mode-tab active" id="tabLive" onclick="switchMode('live')">⚡ Live</div>
+            <div class="mode-tab" id="tabEOD" onclick="switchMode('eod')">📝 EOD</div>
+        </div>
+
+        <label>Asset</label>
+        <select id="assetType" onchange="toggleAssetInput()">
+            <option value="NIFTY">NIFTY</option>
+            <option value="BTC">BTC</option>
+            <option value="STOCK">Individual Stock</option>
+        </select>
+        <div id="stockNameContainer" style="display:none;">
+            <input type="text" id="stockName" placeholder="Symbol (e.g. RELIANCE)">
+        </div>
+
+        <div id="formLive">
+            <h2>Micro Observation</h2>
+            <label>Focus Area</label>
+            <div style="display:flex; gap:5px;">
+                <select id="focusArea"></select>
+                <button style="padding: 5px 10px;" onclick="openTagManager()"><i class="fas fa-cog"></i></button>
+            </div>
+            <label>Notes</label>
+            <textarea id="liveNotes" placeholder="Market behavior..."></textarea>
+        </div>
+
+        <div id="formEOD" style="display: none;">
+            <h2 style="color: var(--purple);">Daily Review</h2>
+            <label>Mistakes</label>
+            <div class="chip-container" id="mistakeContainer">
+                <div class="chip" onclick="toggleChip(this)">FOMO</div>
+                <div class="chip" onclick="toggleChip(this)">Overtrading</div>
+                <div class="chip" onclick="toggleChip(this)">Sizing</div>
+            </div>
+            <textarea id="negativesNotes" placeholder="Mistake details..."></textarea>
+            <label>Bias & Plan</label>
+            <select id="planBias">
+                <option value="Neutral">Neutral</option>
+                <option value="Bullish">Bullish 📈</option>
+                <option value="Bearish">Bearish 📉</option>
+            </select>
+            <input type="text" id="keyLevel" placeholder="Key Level">
+            <textarea id="planNotes" placeholder="Tomorrow's plan..."></textarea>
+        </div>
+
+        <label>Screenshots</label>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" style="border: 1px dashed var(--border); padding: 15px; text-align: center; cursor: pointer; margin-bottom: 10px;">
+            <p style="font-size: 0.8rem; margin:0;">Add Images</p>
+            <input type="file" id="fileInput" accept="image/*" multiple hidden>
+        </div>
+        <div id="previewContainer" style="display:flex; gap:5px; flex-wrap: wrap; margin-bottom: 10px;"></div>
+
+        <button id="btnSubmit" onclick="addEntry()">Add Entry</button>
+        <button id="btnCancel" onclick="cancelEdit()" style="display:none; background: var(--border); margin-top:5px;">Cancel Edit</button>
+        
+        <div class="btn-group">
+            <button class="btn-sql" onclick="downloadSql()" style="background: var(--cyan); color: #000; font-size: 0.7rem;">SQL EXPORT</button>
+            <button class="btn-clear" onclick="clearData()" style="background: var(--danger); font-size: 0.7rem;">CLEAR DB</button>
+        </div>
+    </div>
+
+    <div class="journal-feed">
+        <div class="right-tabs-header">
+            <div class="rt-tab active" id="rt-live" onclick="switchRightTab('live')"><i class="fas fa-bolt"></i> Live Log</div>
+            <div class="rt-tab" id="rt-eod" onclick="switchRightTab('eod')"><i class="fas fa-book-open"></i> EOD Dashboard</div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>Asset</label>
+                <select id="filterAsset" onchange="renderEntries()">
+                    <option value="ALL">All</option>
+                    <option value="NIFTY">NIFTY</option>
+                    <option value="BTC">BTC</option>
+                    <option value="STOCK">Stocks</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Category</label>
+                <select id="filterArea" onchange="renderEntries()">
+                    <option value="ALL">All</option>
+                </select>
+            </div>
+            <div class="filter-group" style="min-width: 150px;">
+                <label>Search</label>
+                <input type="text" id="filterSearch" placeholder="🔍 Search..." oninput="renderEntries()">
+            </div>
+             <div style="display:flex; flex-direction:column;">
+                <label style="margin-bottom:5px;">Layout</label>
+                <div class="layout-controls">
+                    <div class="layout-btn active" id="layout-1" onclick="changeLayout(1)" title="Single Column"><i class="fas fa-bars"></i></div>
+                    <div class="layout-btn" id="layout-2" onclick="changeLayout(2)" title="Double Column"><i class="fas fa-th-large"></i></div>
+                    <div class="layout-btn" id="layout-3" onclick="changeLayout(3)" title="Triple Column"><i class="fas fa-th"></i></div>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label>From</label>
+                <input type="date" id="filterDateStart" onchange="renderEntries()">
+            </div>
+            <div class="filter-group">
+                <label>To</label>
+                <input type="date" id="filterDateEnd" onchange="renderEntries()">
+            </div>
+        </div>
+
+        <div class="right-content-area">
+            <div id="view-live" class="tab-content show"><div id="liveList" class="feed-grid layout-1"></div></div>
+            <div id="view-eod" class="tab-content" style="display:none;"><div id="eodList" class="feed-grid layout-1"></div></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="imgModal">
+    <div class="close-modal-btn" onclick="closeGallery()">&times;</div>
+    <div class="gallery-container">
+        <button class="modal-nav nav-prev" onclick="moveGallery(-1)">&#10094;</button>
+        <img id="modalImg" class="gallery-img-full" src="">
+        <button class="modal-nav nav-next" onclick="moveGallery(1)">&#10095;</button>
+        <div class="modal-info">
+            <div class="modal-desc" id="modalDesc"></div>
+            <div class="modal-counter" id="modalCounter"></div>
+        </div>
+    </div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;" onclick="closeGallery()"></div>
+</div>
+
+<div class="modal" id="tagModal">
+    <div class="modal-content" style="background: var(--card-bg); padding: 20px; border-radius: 12px; width: 300px; border: 1px solid var(--border);">
+        <h3>Manage Tags</h3>
+        <div id="tagListDisplay" style="max-height: 200px; overflow: auto; margin-bottom: 10px;"></div>
+        <input type="text" id="newTagInput" placeholder="New Area..."><br>
+        <button onclick="addNewTag()">Add</button>
+        <button onclick="document.getElementById('tagModal').style.display='none'" style="background:var(--danger)">Close</button>
+    </div>
+</div>
+
+<script>
+    let entries = [];
+    let currentImages = []; 
+    let currentMode = 'live'; 
+    let editingId = null; 
+    let currentLayout = 1;
+    let focusAreas = JSON.parse(localStorage.getItem('journalFocusAreas')) || ["Price Action", "Volume", "Support/Resistance", "Breakout", "Reversal"];
+
+    // --- GLOBAL GALLERY STATE ---
+    let globalGalleryImages = []; // Flattened list of all visible images
+    let currentGalleryIndex = 0;
+
+    // 1. DATA OPERATIONS
+    async function loadFromDB() {
+        try {
+            const res = await fetch('api.php?action=read');
+            const rawData = await res.json();
+            entries = rawData.map(e => ({
+                ...e,
+                id: parseInt(e.id),
+                mistakes: JSON.parse(e.mistakes || "[]"),
+                images: JSON.parse(e.images || "[]"),
+                type: e.entry_type 
+            }));
+            renderEntries();
+            updateFilterOptions();
+        } catch (err) { console.error("Fetch Error:", err); }
+    }
+
+    async function addEntry() {
+        const typeSelect = document.getElementById('assetType').value;
+        const assetName = (typeSelect === 'STOCK') ? document.getElementById('stockName').value : typeSelect;
+
+        const entryData = {
+            id: editingId || Date.now(),
+            entry_type: currentMode,
+            asset: assetName,
+            timestamp_str: editingId ? entries.find(e => e.id === editingId).timestamp_str : new Date().toLocaleString(),
+            
+            // Live fields
+            focus_area: document.getElementById('focusArea').value,
+            notes: document.getElementById('liveNotes').value,
+            
+            // EOD fields
+            mistakes: Array.from(document.querySelectorAll('.chip.selected')).map(c => c.innerText),
+            neg_notes: document.getElementById('negativesNotes').value,
+            plan_bias: document.getElementById('planBias').value,
+            key_level: document.getElementById('keyLevel').value,
+            plan_notes: document.getElementById('planNotes').value,
+            
+            images: currentImages
+        };
+
+        await fetch('api.php?action=save', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(entryData)
+        });
+        
+        editingId ? cancelEdit() : resetForms();
+        loadFromDB();
+    }
+
+    async function deleteEntry(id) {
+        if(confirm("Are you sure you want to delete this entry?")) {
+            await fetch(`api.php?action=delete&id=${id}`);
+            loadFromDB();
+        }
+    }
+
+    // 2. LAYOUT LOGIC
+    function changeLayout(cols) {
+        currentLayout = cols;
+        const liveList = document.getElementById('liveList');
+        const eodList = document.getElementById('eodList');
+        liveList.classList.remove('layout-1', 'layout-2', 'layout-3');
+        eodList.classList.remove('layout-1', 'layout-2', 'layout-3');
+        liveList.classList.add(`layout-${cols}`);
+        eodList.classList.add(`layout-${cols}`);
+        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`layout-${cols}`).classList.add('active');
+    }
+
+    // 3. FILTER & RENDER LOGIC
+    function renderEntries() {
+        // RESET GLOBAL GALLERY LIST
+        globalGalleryImages = [];
+
+        const liveList = document.getElementById('liveList');
+        const eodList = document.getElementById('eodList');
+        
+        const assetF = document.getElementById('filterAsset').value;
+        const areaF = document.getElementById('filterArea').value;
+        const searchF = document.getElementById('filterSearch').value.toLowerCase();
+        const startF = document.getElementById('filterDateStart').value; 
+        const endF = document.getElementById('filterDateEnd').value;    
+
+        const filtered = entries.filter(e => {
+            const matchAsset = (assetF === 'ALL') || (assetF === 'STOCK' ? !['NIFTY','BTC'].includes(e.asset) : e.asset === assetF);
+            const matchArea = (areaF === 'ALL') || (e.focus_area === areaF);
+            const matchSearch = (e.notes && e.notes.toLowerCase().includes(searchF)) || (e.asset && e.asset.toLowerCase().includes(searchF));
+            
+            let matchDate = true;
+            if (startF || endF) {
+                const entryDate = new Date(e.id);
+                entryDate.setHours(0,0,0,0); 
+                if (startF) {
+                    const startDate = new Date(startF + 'T00:00:00');
+                    if (entryDate < startDate) matchDate = false;
+                }
+                if (endF) {
+                    const endDate = new Date(endF + 'T00:00:00');
+                    if (entryDate > endDate) matchDate = false;
+                }
+            }
+            return matchAsset && matchArea && matchSearch && matchDate;
+        });
+
+        const liveEntries = filtered.filter(e => e.type === 'live');
+        const eodEntries = filtered.filter(e => e.type === 'eod');
+
+        // Helper to register images to global list
+        const registerImage = (src, entry) => {
+            const index = globalGalleryImages.length;
+            let title = entry.asset;
+            let sub = entry.timestamp_str.split(',')[1]?.trim().slice(0,5) || "";
+            if(entry.type === 'eod') sub = entry.timestamp_str.split(',')[0];
+            
+            globalGalleryImages.push({ 
+                src: src, 
+                desc: `${title} (${sub})`
+            });
+            return index;
+        };
+
+        liveList.innerHTML = liveEntries.map(e => {
+            let safeTime = "00:00";
+            if (e.timestamp_str && e.timestamp_str.includes(',')) {
+                safeTime = e.timestamp_str.split(',')[1].trim().slice(0,5);
+            } else if (e.timestamp_str) {
+                safeTime = e.timestamp_str.slice(-5);
+            }
+
+            // Map images and register them
+            const imagesHtml = e.images.map(img => {
+                const gIndex = registerImage(img, e);
+                return `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${gIndex})">`;
+            }).join('');
+
+            return `
+            <div class="live-card">
+                <div class="live-time">${safeTime}</div>
+                <div class="live-content">
+                    <div class="live-header">
+                        <div style="font-weight:bold; color:var(--text-main);">${e.asset}</div>
+                        <div class="live-badge">${e.focus_area}</div>
+                    </div>
+                    <div style="color: #cbd5e1; font-size: 0.9rem;">${e.notes}</div>
+                    <div class="entry-gallery">${imagesHtml}</div>
+                    <div style="margin-top:5px; font-size:0.8rem; text-align:right;">
+                        <i class="fas fa-edit action-icon" onclick="editEntry(${e.id})" title="Edit"></i>
+                        <i class="fas fa-trash action-icon del" style="margin-left:10px;" onclick="deleteEntry(${e.id})" title="Delete"></i>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        eodList.innerHTML = eodEntries.map(e => {
+            const biasClass = e.plan_bias === 'Bullish' ? 'bias-bullish' : (e.plan_bias === 'Bearish' ? 'bias-bearish' : 'bias-neutral');
+            const mistakesHtml = e.mistakes.length > 0 
+                ? `<div class="mistake-row">${e.mistakes.map(m => `<span class="mistake-pill"><i class="fas fa-exclamation-circle"></i> ${m}</span>`).join('')}</div>`
+                : '';
+            
+            const safeDate = (e.timestamp_str && e.timestamp_str.includes(',')) 
+                ? e.timestamp_str.split(',')[0] 
+                : e.timestamp_str;
+
+             // Map images and register them
+             const imagesHtml = e.images.map(img => {
+                const gIndex = registerImage(img, e);
+                return `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${gIndex})">`;
+            }).join('');
+
+            return `
+            <div class="eod-card">
+                <div class="eod-header">
+                    <div class="asset-title ${biasClass}"><i class="fas fa-chart-bar"></i> ${e.asset}</div>
+                    <div class="date-badge">${safeDate}</div>
+                </div>
+                <div class="eod-body">
+                    <div class="eod-meta">
+                        <div class="stat-box ${biasClass}" style="border-left: 3px solid currentColor;">
+                            <span class="stat-label">Bias</span>
+                            <span class="stat-value">${e.plan_bias}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Key Level</span>
+                            <span class="stat-value" style="font-family:monospace; color:var(--cyan);">${e.key_level || '-'}</span>
+                        </div>
+                    </div>
+                    <div class="eod-analysis">
+                        ${mistakesHtml}
+                        <div class="detail-text">${e.neg_notes || '<span style="color:gray; font-style:italic">No mistake details...</span>'}</div>
+                        <div class="plan-text">Plan: ${e.plan_notes}</div>
+                        <div class="entry-gallery">${imagesHtml}</div>
+                    </div>
+                </div>
+                <div class="action-bar">
+                    <i class="fas fa-edit action-icon" onclick="editEntry(${e.id})"></i>
+                    <i class="fas fa-trash action-icon del" onclick="deleteEntry(${e.id})"></i>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // --- GLOBAL GALLERY LOGIC ---
+    function openGlobalGallery(index) {
+        if(index < 0 || index >= globalGalleryImages.length) return;
+        currentGalleryIndex = index;
+        updateGalleryView();
+        document.getElementById('imgModal').style.display = 'flex';
+    }
+
+    function updateGalleryView() {
+        const item = globalGalleryImages[currentGalleryIndex];
+        document.getElementById('modalImg').src = item.src;
+        document.getElementById('modalDesc').innerText = item.desc;
+        
+        // Hide/Show Navigation buttons based on total image count
+        const display = globalGalleryImages.length > 1 ? 'flex' : 'none';
+        document.querySelectorAll('.modal-nav').forEach(btn => btn.style.display = display);
+        
+        document.getElementById('modalCounter').innerText = `${currentGalleryIndex + 1} / ${globalGalleryImages.length}`;
+    }
+
+    function moveGallery(step) {
+        currentGalleryIndex += step;
+        // Loop Logic
+        if (currentGalleryIndex >= globalGalleryImages.length) currentGalleryIndex = 0;
+        if (currentGalleryIndex < 0) currentGalleryIndex = globalGalleryImages.length - 1;
+        updateGalleryView();
+    }
+
+    function closeGallery() {
+        document.getElementById('imgModal').style.display = 'none';
+    }
+
+    // Keyboard support for Gallery
+    document.addEventListener('keydown', (e) => {
+        if(document.getElementById('imgModal').style.display === 'flex') {
+            if(e.key === 'ArrowLeft') moveGallery(-1);
+            if(e.key === 'ArrowRight') moveGallery(1);
+            if(e.key === 'Escape') closeGallery();
+        }
+    });
+
+    // 4. UI HELPERS
+    function updateFilterOptions() {
+        const areaSelect = document.getElementById('filterArea');
+        areaSelect.innerHTML = '<option value="ALL">All Categories</option>' + 
+            focusAreas.map(a => `<option value="${a}">${a}</option>`).join('');
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('formLive').style.display = mode === 'live' ? 'block' : 'none';
+        document.getElementById('formEOD').style.display = mode === 'eod' ? 'block' : 'none';
+        document.getElementById('tabLive').className = mode === 'live' ? 'mode-tab active' : 'mode-tab';
+        document.getElementById('tabEOD').className = mode === 'eod' ? 'mode-tab active-eod' : 'mode-tab';
+    }
+
+    function switchRightTab(t) {
+        document.querySelectorAll('.rt-tab').forEach(el => el.classList.remove('active', 'active-purple'));
+        document.getElementById('rt-'+t).classList.add(t=='eod'?'active-purple':'active');
+        document.getElementById('view-live').style.display = t === 'live' ? 'block' : 'none';
+        document.getElementById('view-eod').style.display = t === 'eod' ? 'block' : 'none';
+    }
+
+    function toggleAssetInput() {
+        const type = document.getElementById('assetType').value;
+        document.getElementById('stockNameContainer').style.display = (type === 'STOCK') ? 'block' : 'none';
+    }
+
+    function toggleChip(chip) { chip.classList.toggle('selected'); }
+
+    function resetForms() {
+        document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        currentImages = []; document.getElementById('previewContainer').innerHTML = '';
+        editingId = null;
+        document.getElementById('btnCancel').style.display = 'none';
+        document.getElementById('btnSubmit').innerText = "Add Entry";
+    }
+    
+    function cancelEdit() {
+        resetForms();
+    }
+
+    function editEntry(id) {
+        const e = entries.find(x => x.id === id);
+        if(!e) return;
+        
+        editingId = id;
+        switchMode(e.type);
+        document.getElementById('btnSubmit').innerText = "Update Entry";
+        document.getElementById('btnCancel').style.display = 'block';
+        
+        const isStandard = ['NIFTY','BTC'].includes(e.asset);
+        document.getElementById('assetType').value = isStandard ? e.asset : 'STOCK';
+        document.getElementById('stockName').value = isStandard ? '' : e.asset;
+        toggleAssetInput();
+
+        if(e.type === 'live') {
+            document.getElementById('liveNotes').value = e.notes;
+            document.getElementById('focusArea').value = e.focus_area;
+        } else {
+            document.getElementById('negativesNotes').value = e.neg_notes;
+            document.getElementById('planNotes').value = e.plan_notes;
+            document.getElementById('keyLevel').value = e.key_level;
+            document.getElementById('planBias').value = e.plan_bias;
+
+            document.querySelectorAll('.chip').forEach(c => {
+                c.classList.remove('selected');
+                if(e.mistakes && e.mistakes.includes(c.innerText)) {
+                    c.classList.add('selected');
+                }
+            });
+        }
+        currentImages = e.images;
+        renderPreviews();
+    }
+
+    document.getElementById('fileInput').onchange = (e) => {
+        Array.from(e.target.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (ev) => { currentImages.push(ev.target.result); renderPreviews(); };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    function renderPreviews() {
+        document.getElementById('previewContainer').innerHTML = currentImages.map((img, i) => `
+            <div style="position:relative;"><img src="${img}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">
+            <button onclick="currentImages.splice(${i},1);renderPreviews()" style="position:absolute;top:0;right:0;padding:2px;background:red;font-size:10px;">X</button></div>
+        `).join('');
+    }
+
+    function openTagManager() {
+        document.getElementById('tagListDisplay').innerHTML = focusAreas.map((a,i) => `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #334155;">${a} <i class="fas fa-trash" onclick="focusAreas.splice(${i},1);openTagManager();renderFocusOptions();updateFilterOptions();"></i></div>`).join('');
+        document.getElementById('tagModal').style.display = 'flex';
+    }
+
+    function addNewTag() {
+        const v = document.getElementById('newTagInput').value;
+        if(v) { focusAreas.push(v); localStorage.setItem('journalFocusAreas', JSON.stringify(focusAreas)); renderFocusOptions(); updateFilterOptions(); openTagManager(); }
+    }
+
+    function renderFocusOptions() { document.getElementById('focusArea').innerHTML = focusAreas.map(a=>`<option value="${a}">${a}</option>`).join(''); }
+    
+    function clearData() { if(confirm("Delete ALL entries?")) { entries.forEach(async e => await fetch(`api.php?action=delete&id=${e.id}`)); loadFromDB(); } }
+
+    function downloadSql() {
+        let sql = "INSERT INTO journal_entries (...) VALUES ..."; 
+        const blob = new Blob([sql], {type: 'application/sql'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "export.sql";
+        a.click();
+    }
+
+    // Init
+    renderFocusOptions();
+    loadFromDB();
+</script>
+</body>
+</html>
