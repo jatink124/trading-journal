@@ -15,144 +15,134 @@
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; display: flex; gap: 20px; height: 100vh; box-sizing: border-box; }
         .container { display: flex; width: 100%; gap: 20px; height: 100%; }
         
-        /* --- INPUT PANEL (Left Side) --- */
         .input-panel { flex: 1; background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; max-width: 400px; }
-        
-        /* --- ANALYTICAL FEED (Right Side) --- */
         .journal-feed { flex: 2; background: var(--feed-bg); border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-        
         .right-tabs-header { display: flex; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid var(--border); padding: 0 10px; }
+        
         .rt-tab { padding: 15px 15px; cursor: pointer; color: var(--text-muted); font-weight: 600; border-bottom: 3px solid transparent; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
         .rt-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
         .rt-tab.active-purple { color: var(--purple); border-bottom-color: var(--purple); }
+        .rt-tab.active-cyan { color: var(--cyan); border-bottom-color: var(--cyan); }
+        .rt-tab.active-green { color: var(--success); border-bottom-color: var(--success); }
 
         .filter-bar { background: var(--card-bg); padding: 15px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
         .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 100px; }
         .filter-bar input, .filter-bar select { margin-bottom: 0; font-size: 0.8rem; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; width: 100%; box-sizing: border-box;}
 
-        /* --- LAYOUT CONTROLS --- */
         .layout-controls { display: flex; gap: 5px; background: #0f172a; padding: 4px; border-radius: 6px; border: 1px solid var(--border); height: 34px; box-sizing: border-box; align-items: center;}
         .layout-btn { padding: 5px 10px; cursor: pointer; color: var(--text-muted); border-radius: 4px; transition: 0.2s; font-size: 0.9rem; display: flex; align-items: center; }
-        .layout-btn:hover { background: rgba(255,255,255,0.1); color: white; }
         .layout-btn.active { background: var(--accent); color: white; }
 
         .right-content-area { flex: 1; overflow-y: auto; padding: 20px; position: relative; scrollbar-width: thin; }
-        
-        /* --- GRID SYSTEM FOR FEED --- */
-        .feed-grid { display: grid; gap: 15px; align-items: start; }
+        /* Grid Layout Fixes */
+        .feed-grid { display: grid; gap: 15px; width: 100%; }
         .feed-grid.layout-1 { grid-template-columns: 1fr; }
         .feed-grid.layout-2 { grid-template-columns: 1fr 1fr; }
         .feed-grid.layout-3 { grid-template-columns: 1fr 1fr 1fr; }
+        
+        .date-header { grid-column: 1 / -1; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); padding: 8px 15px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-top: 15px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); width: 100%; box-sizing: border-box; }
+        .date-header i { color: var(--accent); }
 
-        /* Responsive Fallback */
-        @media (max-width: 1200px) { .feed-grid.layout-3 { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 768px) { .feed-grid.layout-2, .feed-grid.layout-3 { grid-template-columns: 1fr; } }
-
-
-        /* --- CARD DESIGNS --- */
-        /* 1. Live Card */
-        .live-card {
-            display: flex; gap: 15px; background: #172033; 
-            padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent);
-            align-items: flex-start; height: 100%; box-sizing: border-box;
-        }
+        .live-card, .eod-card, .resource-card, .trade-card { height: 100%; box-sizing: border-box; }
+        .live-card { display: flex; gap: 15px; background: #172033; padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent); align-items: flex-start; }
         .live-time { min-width: 50px; font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
         .live-content { flex: 1; min-width: 0; }
         .live-header { display: flex; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; gap: 5px; }
         .live-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; white-space: nowrap;}
-        
-        /* 2. EOD Card */
-        .eod-card {
-            background: #1e293b; border: 1px solid var(--border); border-radius: 10px; 
-            overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); height: 100%; display: flex; flex-direction: column;
-        }
-        
-        .eod-header { 
-            padding: 10px 15px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+
+        .eod-card { background: #1e293b; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; }
+        .eod-header { padding: 10px 15px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .asset-title { font-size: 1.1rem; font-weight: bold; letter-spacing: 0.5px; }
         .date-badge { font-size: 0.8rem; color: var(--text-muted); }
-        
         .eod-body { display: grid; grid-template-columns: 1.2fr 2fr; gap: 0; flex: 1; }
-        
-        /* Responsive internal card layout */
-        .feed-grid.layout-2 .eod-body, 
-        .feed-grid.layout-3 .eod-body { grid-template-columns: 1fr; } 
-        
         .eod-meta { padding: 15px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
-        
-        /* Stack to Row in multi-view */
-        .feed-grid.layout-2 .eod-meta,
-        .feed-grid.layout-3 .eod-meta { flex-direction: row; border-right: none; border-bottom: 1px solid var(--border); padding: 10px; gap: 10px;}
-        .feed-grid.layout-2 .stat-box,
-        .feed-grid.layout-3 .stat-box { flex: 1; }
-
         .stat-box { background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
         .stat-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; display: block; }
         .stat-value { font-size: 0.95rem; font-weight: 600; }
-        
         .bias-bullish { color: var(--success); border-color: var(--success); }
         .bias-bearish { color: var(--danger); border-color: var(--danger); }
         .bias-neutral { color: var(--text-muted); }
-
         .eod-analysis { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         
-        .mistake-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
-        .mistake-pill { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
-        
-        .detail-text { font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; }
-        .plan-text { font-size: 0.9rem; color: var(--accent); font-style: italic; border-left: 2px solid var(--accent); padding-left: 10px; margin-top: 5px;}
+        .resource-card { background: #172033; padding: 15px; border-radius: 8px; border-left: 3px solid var(--cyan); display: flex; flex-direction: column; gap: 10px; }
+        .resource-item { display: flex; flex-direction: column; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 4px; }
+        .resource-label { color: var(--cyan); font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; }
+        .resource-val { font-size: 0.9rem; color: var(--text-main); }
 
-        .action-bar { padding: 8px 15px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 15px; }
-        .action-icon { cursor: pointer; font-size: 0.9rem; color: var(--text-muted); transition: 0.2s; }
-        .action-icon:hover { color: white; }
-        .action-icon.del:hover { color: var(--danger); }
+        .trade-card { background: #1e293b; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+        .trade-header { background: rgba(0,0,0,0.2); padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .trade-pnl { font-size: 1.2rem; font-weight: bold; font-family: monospace; }
+        .pnl-green { color: var(--success); } .pnl-red { color: var(--danger); }
+        .trade-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .trade-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .trade-stat { background: #0f172a; padding: 8px; border-radius: 6px; text-align: center; border: 1px solid var(--border); }
+        .ts-lbl { font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 2px; }
+        .ts-val { font-weight: 600; font-size: 0.9rem; }
+        .trade-learning { background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); padding: 10px; border-radius: 4px; font-size: 0.9rem; color: #fca5a5; }
 
-        .entry-gallery { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-        .entry-img { height: 60px; border-radius: 4px; border: 1px solid var(--border); cursor: zoom-in; object-fit: cover; transition: 0.2s; }
-        .entry-img:hover { opacity: 0.8; border-color: var(--accent); }
-
-        /* --- GLOBAL INPUTS --- */
-        h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;}
-        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.8rem; margin-top: 10px; }
-        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
-        
         .mode-tabs { display: flex; background: #0f172a; padding: 5px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border); }
         .mode-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: 600; color: var(--text-muted); transition: 0.2s; }
         .mode-tab.active { background: var(--accent); color: white; }
         .mode-tab.active-eod { background: var(--purple); color: white; }
-        
+        .mode-tab.active-cyan { background: var(--cyan); color: #000; }
+        .mode-tab.active-green { background: var(--success); color: white; }
+
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
         .chip { background: #0f172a; border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
         .chip.selected { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); color: var(--danger); }
         
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .mistake-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+        .mistake-pill { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        
+        .action-bar { padding: 8px 15px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 15px; }
+        .action-icon { cursor: pointer; font-size: 0.9rem; color: var(--text-muted); transition: 0.2s; }
+        .action-icon:hover { color: white; }
+        .action-icon.del:hover { color: var(--danger); }
+        
+        .entry-gallery { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+        .entry-img { height: 60px; border-radius: 4px; border: 1px solid var(--border); cursor: zoom-in; object-fit: cover; transition: 0.2s; }
+        .entry-img:hover { opacity: 0.8; border-color: var(--accent); }
+
+        h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;}
+        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.8rem; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
         button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         
-        /* --- GALLERY MODAL STYLES --- */
+        .dyn-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; }
+        .dyn-row input { margin-bottom: 0; }
+        .dyn-del { background: var(--danger); padding: 0 10px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: white; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .detail-text { font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; }
+        .plan-text { font-size: 0.9rem; color: var(--accent); font-style: italic; border-left: 2px solid var(--accent); padding-left: 10px; margin-top: 5px;}
+
+        /* Checklist Styles */
+        .btn-checklist { background: linear-gradient(135deg, #10b981, #059669); color: white; margin-bottom: 15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); border: 1px solid #059669; }
+        .btn-checklist:hover { filter: brightness(1.1); }
+        
+        .checklist-container { max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .checklist-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px; margin-bottom: 8px; border-radius: 8px; border: 1px solid transparent; transition: 0.2s; cursor: pointer; user-select: none; }
+        .checklist-item:hover { background: rgba(255,255,255,0.08); }
+        .checklist-item.checked { background: rgba(16, 185, 129, 0.1); border-color: var(--success); }
+        .checklist-item.checked .cl-text { text-decoration: line-through; color: var(--text-muted); }
+        .checklist-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0;}
+        .checklist-item.checked .checklist-checkbox { background: var(--success); border-color: var(--success); }
+        .checklist-item.checked .checklist-checkbox::after { content: '✓'; color: white; font-size: 12px; }
+        .cl-text { flex: 1; font-size: 0.95rem; }
+        .cl-progress { height: 6px; background: #0f172a; border-radius: 3px; margin: 15px 0 20px 0; overflow: hidden; }
+        .cl-bar { height: 100%; background: var(--success); width: 0%; transition: 0.3s; }
+
+        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .gallery-container { position: relative; max-width: 95%; max-height: 95%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .gallery-img-full { max-width: 100%; max-height: 85vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
-        
         .modal-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); color: white; border: none; padding: 15px; cursor: pointer; font-size: 1.5rem; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 1001; }
-        .modal-nav:hover { background: rgba(255,255,255,0.3); transform: translateY(-50%) scale(1.1); }
-        .nav-prev { left: -70px; } 
-        .nav-next { right: -70px; }
-        
-        /* Mobile adjust for arrows */
-        @media (max-width: 768px) {
-            .nav-prev { left: 10px; background: rgba(0,0,0,0.5); }
-            .nav-next { right: 10px; background: rgba(0,0,0,0.5); }
-        }
-
+        .nav-prev { left: -70px; } .nav-next { right: -70px; }
+        @media (max-width: 768px) { .nav-prev { left: 10px; background: rgba(0,0,0,0.5); } .nav-next { right: 10px; background: rgba(0,0,0,0.5); } }
         .modal-info { position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); text-align: center; width: 100%; }
         .modal-counter { color: var(--text-muted); font-family: monospace; font-size: 1rem; }
         .modal-desc { color: var(--accent); font-size: 0.9rem; margin-top: 4px; font-weight: 600; }
-        
         .close-modal-btn { position: absolute; top: 20px; right: 20px; background: none; color: white; font-size: 2rem; cursor: pointer; z-index: 1002; opacity: 0.7; }
-        .close-modal-btn:hover { opacity: 1; }
-
     </style>
 </head>
 <body>
@@ -161,8 +151,13 @@
     <div class="input-panel">
         <div class="mode-tabs">
             <div class="mode-tab active" id="tabLive" onclick="switchMode('live')">⚡ Live</div>
-            <div class="mode-tab" id="tabEOD" onclick="switchMode('eod')">📝 EOD</div>
+            <div class="mode-tab" id="tabTrade" onclick="switchMode('trade')">💰 Trade</div>
+            <div class="mode-tab" id="tabEOD" onclick="switchMode('eod')">📖 EOD</div>
+            <div class="mode-tab" id="tabSource" onclick="switchMode('source')">🌐 Res</div>
         </div>
+
+        <label>Date & Time</label>
+        <input type="datetime-local" id="entryTime">
 
         <label>Asset</label>
         <select id="assetType" onchange="toggleAssetInput()">
@@ -176,6 +171,9 @@
 
         <div id="formLive">
             <h2>Micro Observation</h2>
+            <button class="btn-checklist" onclick="openChecklist()">
+                <i class="fas fa-clipboard-check"></i> Consult Checklist
+            </button>
             <label>Focus Area</label>
             <div style="display:flex; gap:5px;">
                 <select id="focusArea"></select>
@@ -183,6 +181,32 @@
             </div>
             <label>Notes</label>
             <textarea id="liveNotes" placeholder="Market behavior..."></textarea>
+        </div>
+
+        <div id="formTrade" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="color: var(--success); margin-bottom:10px;">Trade Log</h2>
+                <button onclick="document.getElementById('importModal').style.display='flex'" style="padding: 5px 10px; font-size:0.8rem; background: var(--border); margin-bottom:10px;">
+                    <i class="fas fa-file-import"></i> Import
+                </button>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Entry</label><input type="number" id="tradeEntry" placeholder="0.00" step="0.05" oninput="calculatePnL()"></div>
+                <div><label>Exit</label><input type="number" id="tradeExit" placeholder="0.00" step="0.05" oninput="calculatePnL()"></div>
+            </div>
+            <label>Quantity (Lots)</label>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                <input type="number" id="tradeLots" value="1" min="1" style="margin-bottom:0;" oninput="calculatePnL()">
+                <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">x 75 = <span id="tradeQtyDisp">75</span> units</span>
+            </div>
+            
+            <div style="background: rgba(0,0,0,0.3); padding:15px; border-radius:8px; border:1px solid var(--border); text-align:center; margin-bottom:15px;">
+                <span style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:5px;">Net P&L (Charges: ₹45)</span>
+                <div id="tradePnLDisplay" style="font-size:1.5rem; font-weight:bold; font-family:monospace; color:var(--text-muted);">0.00</div>
+            </div>
+
+            <label>Learning / Mistake</label>
+            <textarea id="tradeLearning" placeholder="What did I learn from this trade?"></textarea>
         </div>
 
         <div id="formEOD" style="display: none;">
@@ -197,11 +221,22 @@
             <label>Bias & Plan</label>
             <select id="planBias">
                 <option value="Neutral">Neutral</option>
-                <option value="Bullish">Bullish 📈</option>
-                <option value="Bearish">Bearish 📉</option>
+                <option value="Bullish">Bullish 🐂</option>
+                <option value="Bearish">Bearish 🐻</option>
             </select>
             <input type="text" id="keyLevel" placeholder="Key Level">
             <textarea id="planNotes" placeholder="Tomorrow's plan..."></textarea>
+        </div>
+
+        <div id="formSource" style="display: none;">
+            <h2 style="color: var(--cyan);">External Insights</h2>
+            <div id="resourceRows">
+                <div class="dyn-row">
+                    <input type="text" class="src-key" placeholder="Source (e.g. CNBC)">
+                    <input type="text" class="src-val" placeholder="Info/Quote...">
+                </div>
+            </div>
+            <button onclick="addResourceRow()" style="background:var(--border); width:100%; margin-top:5px; font-size:0.8rem;">+ Add Field</button>
         </div>
 
         <label>Screenshots</label>
@@ -222,52 +257,66 @@
 
     <div class="journal-feed">
         <div class="right-tabs-header">
-            <div class="rt-tab active" id="rt-live" onclick="switchRightTab('live')"><i class="fas fa-bolt"></i> Live Log</div>
-            <div class="rt-tab" id="rt-eod" onclick="switchRightTab('eod')"><i class="fas fa-book-open"></i> EOD Dashboard</div>
+            <div class="rt-tab active" id="rt-live" onclick="switchRightTab('live')"><i class="fas fa-bolt"></i> Live</div>
+            <div class="rt-tab" id="rt-trade" onclick="switchRightTab('trade')"><i class="fas fa-chart-line"></i> Trades</div>
+            <div class="rt-tab" id="rt-eod" onclick="switchRightTab('eod')"><i class="fas fa-book-open"></i> EOD</div>
+            <div class="rt-tab" id="rt-source" onclick="switchRightTab('source')"><i class="fas fa-globe"></i> Res</div>
         </div>
 
         <div class="filter-bar">
+            <div class="filter-group"><label>Asset</label><select id="filterAsset" onchange="renderEntries()"><option value="ALL">All</option><option value="NIFTY">NIFTY</option><option value="BTC">BTC</option><option value="STOCK">Stocks</option></select></div>
+            <div class="filter-group"><label>Category</label><select id="filterArea" onchange="renderEntries()"><option value="ALL">All</option></select></div>
+            <div class="filter-group" style="min-width: 150px;"><label>Search</label><input type="text" id="filterSearch" placeholder="🔍 Search..." oninput="renderEntries()"></div>
             <div class="filter-group">
-                <label>Asset</label>
-                <select id="filterAsset" onchange="renderEntries()">
-                    <option value="ALL">All</option>
-                    <option value="NIFTY">NIFTY</option>
-                    <option value="BTC">BTC</option>
-                    <option value="STOCK">Stocks</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Category</label>
-                <select id="filterArea" onchange="renderEntries()">
-                    <option value="ALL">All</option>
-                </select>
-            </div>
-            <div class="filter-group" style="min-width: 150px;">
-                <label>Search</label>
-                <input type="text" id="filterSearch" placeholder="🔍 Search..." oninput="renderEntries()">
-            </div>
-             <div style="display:flex; flex-direction:column;">
-                <label style="margin-bottom:5px;">Layout</label>
+                <label>Layout</label>
                 <div class="layout-controls">
                     <div class="layout-btn active" id="layout-1" onclick="changeLayout(1)" title="Single Column"><i class="fas fa-bars"></i></div>
                     <div class="layout-btn" id="layout-2" onclick="changeLayout(2)" title="Double Column"><i class="fas fa-th-large"></i></div>
                     <div class="layout-btn" id="layout-3" onclick="changeLayout(3)" title="Triple Column"><i class="fas fa-th"></i></div>
                 </div>
             </div>
-            
-            <div class="filter-group">
-                <label>From</label>
-                <input type="date" id="filterDateStart" onchange="renderEntries()">
-            </div>
-            <div class="filter-group">
-                <label>To</label>
-                <input type="date" id="filterDateEnd" onchange="renderEntries()">
-            </div>
+            <div class="filter-group"><label>From</label><input type="date" id="filterDateStart" onchange="renderEntries()"></div>
+            <div class="filter-group"><label>To</label><input type="date" id="filterDateEnd" onchange="renderEntries()"></div>
         </div>
 
         <div class="right-content-area">
             <div id="view-live" class="tab-content show"><div id="liveList" class="feed-grid layout-1"></div></div>
+            <div id="view-trade" class="tab-content" style="display:none;"><div id="tradeList" class="feed-grid layout-1"></div></div>
             <div id="view-eod" class="tab-content" style="display:none;"><div id="eodList" class="feed-grid layout-1"></div></div>
+            <div id="view-source" class="tab-content" style="display:none;"><div id="sourceList" class="feed-grid layout-1"></div></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="importModal">
+    <div class="modal-content" style="background: var(--card-bg); padding: 25px; border-radius: 12px; width: 500px; border: 1px solid var(--border); max-height:90vh; overflow-y:auto;">
+        <h3 style="margin-top:0;">Import Trades</h3>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+            <button onclick="switchImportMethod('link')" id="btnImpLink" style="padding:5px 10px; background:var(--accent); font-size:0.8rem;">From Google Sheet Link</button>
+            <button onclick="switchImportMethod('text')" id="btnImpText" style="padding:5px 10px; background:var(--card-bg); border:1px solid var(--border); font-size:0.8rem;">Paste Text</button>
+        </div>
+
+        <label>Select Date for these trades</label>
+        <input type="date" id="importDate" style="margin-bottom:15px;">
+
+        <div id="impLinkArea">
+            <label>Google Sheet Link</label>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:-5px; margin-bottom:10px;">
+                Make sure the sheet is "Anyone with the link" or Published.<br>
+                Format: <code>docs.google.com/.../edit?gid=...</code>
+            </p>
+            <input type="text" id="importUrl" placeholder="https://docs.google.com/spreadsheets/d/..." style="width:100%;">
+        </div>
+
+        <div id="impTextArea" style="display:none;">
+            <label>Paste Data (Time | Signal | Asset | Qty | Type | Price)</label>
+            <textarea id="importText" placeholder="Paste data here..." style="height:150px; font-family:monospace; font-size:0.8rem;"></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:15px;">
+            <button onclick="processImport()" style="background:var(--success);">Process & Import</button>
+            <button onclick="document.getElementById('importModal').style.display='none'" style="background:var(--danger);">Close</button>
         </div>
     </div>
 </div>
@@ -284,6 +333,24 @@
         </div>
     </div>
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;" onclick="closeGallery()"></div>
+</div>
+
+<div class="modal" id="checklistModal">
+    <div class="modal-content" style="background: var(--card-bg); padding: 25px; border-radius: 12px; width: 400px; border: 1px solid var(--border); position:relative;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0; color:var(--text-main); font-size:1.3rem;">Pre-Trade Checklist</h3>
+            <button onclick="document.getElementById('checklistModal').style.display='none'" style="background:none; color:var(--text-muted); padding:5px; font-size:1.2rem;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cl-progress"><div class="cl-bar" id="checklistBar"></div></div>
+        <div id="checklistItemsContainer" class="checklist-container"></div>
+        <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:15px;">
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="newChecklistInput" placeholder="Add new rule..." style="margin-bottom:0;">
+                <button onclick="addChecklistItem()" style="padding: 10px; width:auto;"><i class="fas fa-plus"></i></button>
+            </div>
+            <button onclick="resetChecklist()" style="width:100%; background:var(--card-bg); border:1px solid var(--border); color:var(--text-muted); margin-top:10px; font-size:0.8rem;">Reset Checks</button>
+        </div>
+    </div>
 </div>
 
 <div class="modal" id="tagModal">
@@ -303,12 +370,220 @@
     let editingId = null; 
     let currentLayout = 1;
     let focusAreas = JSON.parse(localStorage.getItem('journalFocusAreas')) || ["Price Action", "Volume", "Support/Resistance", "Breakout", "Reversal"];
+    let checklistRules = [];
 
-    // --- GLOBAL GALLERY STATE ---
-    let globalGalleryImages = []; // Flattened list of all visible images
-    let currentGalleryIndex = 0;
+    // --- IMPORT UI LOGIC ---
+    let importMethod = 'text'; // Default to Text for copy-paste
 
-    // 1. DATA OPERATIONS
+    function switchImportMethod(m) {
+        importMethod = m;
+        document.getElementById('impLinkArea').style.display = (m==='link') ? 'block' : 'none';
+        document.getElementById('impTextArea').style.display = (m==='text') ? 'block' : 'none';
+        
+        document.getElementById('btnImpLink').style.background = (m==='link') ? 'var(--accent)' : 'var(--card-bg)';
+        document.getElementById('btnImpText').style.background = (m==='text') ? 'var(--accent)' : 'var(--card-bg)';
+    }
+
+    // --- MAIN IMPORT LOGIC ---
+    async function processImport() {
+        const dateVal = document.getElementById('importDate').value;
+        if(!dateVal) { alert("Please select a date"); return; }
+
+        let rawText = "";
+
+        if (importMethod === 'text') {
+            rawText = document.getElementById('importText').value;
+            if(!rawText) { alert("Please paste text"); return; }
+            parseAndSave(rawText, dateVal);
+        } else {
+            const url = document.getElementById('importUrl').value;
+            if(!url) { alert("Please enter a URL"); return; }
+            
+            try {
+                const btn = document.querySelector('#importModal button[onclick="processImport()"]');
+                const oldText = btn.innerText;
+                btn.innerText = "Fetching..."; btn.disabled = true;
+
+                const res = await fetch(`api.php?action=fetch_sheet&url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+
+                btn.innerText = oldText; btn.disabled = false;
+
+                if(data.error) {
+                    alert("Error: " + data.error);
+                } else if (data.success && data.csv) {
+                    parseAndSave(data.csv, dateVal);
+                }
+            } catch(e) {
+                alert("Network/Server Error: " + e);
+            }
+        }
+    }
+
+    async function parseAndSave(text, dateVal) {
+        let parsedRows = [];
+
+        // STRATEGY 1: SMART PARSER (For "Mashed" Data like your example)
+        // Regex looks for: Time -> s/b -> Asset -> Qty(130 / 130) -> Type -> Price
+        const mashedRegex = /(\d{2}:\d{2}:\d{2})\s*([sb])\s*(.*?)\s*(\d+\s*\/\s*\d+)\s*([a-zA-Z]+)\s*([\d\.]+)/g;
+        
+        // Clean newlines to handle "NSE\nTV" issues
+        const cleanText = text.replace(/\r\n|\r|\n/g, ' ');
+        
+        let match;
+        while ((match = mashedRegex.exec(cleanText)) !== null) {
+            parsedRows.push({
+                time: match[1],
+                signal: match[2].toLowerCase(),
+                asset: match[3].trim(),
+                qtyStr: match[4],
+                price: parseFloat(match[6])
+            });
+        }
+
+        // STRATEGY 2: FALLBACK CSV/TSV (If regex failed to find rows, try standard split)
+        if (parsedRows.length === 0) {
+            const rows = text.split('\n').filter(r => r.trim() !== '');
+            parsedRows = rows.map(r => {
+                let cols = r.split(/[\t,]/).map(c => c.trim().replace(/^"|"$/g, ''));
+                if(cols.length < 5) return null;
+                return {
+                    time: cols[0],
+                    signal: cols[1].toLowerCase(),
+                    asset: cols[2],
+                    qtyStr: cols[3],
+                    price: parseFloat(cols[cols.length-1])
+                };
+            }).filter(r => r !== null && !isNaN(r.price));
+        }
+
+        if (parsedRows.length === 0) {
+            alert("Could not parse data. Ensure it matches the format:\nTime | s/b | Asset | Qty | Type | Price");
+            return;
+        }
+
+        // 2. Sort Oldest First
+        parsedRows.sort((a,b) => a.time.localeCompare(b.time));
+
+        let tradesToSave = [];
+        let openPos = {}; 
+        let unmatchedCount = 0;
+
+        // 3. Match Logic
+        parsedRows.forEach(row => {
+            let sig = row.signal;
+            if(sig.includes('buy') || sig === 'b') sig = 'b';
+            else if(sig.includes('sell') || sig === 's') sig = 's';
+
+            // Lot Logic: 130 = 2 lots (65/lot divisor)
+            const qtyNum = parseFloat(row.qtyStr.split('/')[0]) || 0;
+            let lots = 1;
+            if(qtyNum > 0) lots = Math.round(qtyNum / 65); 
+            if(lots < 1) lots = 1;
+
+            // Simplify Asset Key for matching (ignore small differences)
+            const key = row.asset.replace(/\s+/g, '').toUpperCase(); 
+
+            if(sig === 'b') {
+                if(openPos[key] && openPos[key].type === 's') {
+                    // Close Short
+                    const open = openPos[key];
+                    tradesToSave.push(createTradeObj(dateVal, row.time, open.asset, open.price, row.price, lots, "Short (Imp)"));
+                    delete openPos[key];
+                } else {
+                    // Open Long
+                    openPos[key] = { type: 'b', price: row.price, asset: row.asset };
+                }
+            } else if(sig === 's') {
+                if(openPos[key] && openPos[key].type === 'b') {
+                    // Close Long
+                    const open = openPos[key];
+                    tradesToSave.push(createTradeObj(dateVal, row.time, open.asset, open.price, row.price, lots, "Long (Imp)"));
+                    delete openPos[key];
+                } else {
+                    // Open Short
+                    openPos[key] = { type: 's', price: row.price, asset: row.asset };
+                }
+            }
+        });
+
+        // 4. Feedback
+        const openCount = Object.keys(openPos).length;
+        
+        if(tradesToSave.length === 0) {
+            alert(`Parsed ${parsedRows.length} rows, but found NO matching Buy+Sell pairs.\n(${openCount} open positions found).`);
+            return;
+        }
+
+        let confirmMsg = `Found ${tradesToSave.length} complete trades.`;
+        if(openCount > 0) confirmMsg += `\n(Ignored ${openCount} unmatched/open rows)`;
+        confirmMsg += "\n\nImport these trades?";
+
+        if(confirm(confirmMsg)) {
+            for(let t of tradesToSave) {
+                await fetch('api.php?action=save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(t)
+                });
+            }
+            document.getElementById('importModal').style.display='none';
+            document.getElementById('importUrl').value = '';
+            document.getElementById('importText').value = '';
+            loadFromDB();
+        }
+    }
+
+    function createTradeObj(dateStr, timeStr, fullAsset, entry, exit, lots, note) {
+        // PnL: (Exit - Entry) * (Lots * 65) - 45
+        const qty = lots * 65; 
+        const gross = (exit - entry) * qty;
+        const net = gross - 45;
+
+        let type = 'STOCK';
+        if(fullAsset.toUpperCase().includes('NIFTY')) type = 'NIFTY';
+        if(fullAsset.toUpperCase().includes('BTC')) type = 'BTC';
+
+        return {
+            id: new Date(dateStr + ' ' + timeStr).getTime(), 
+            entry_type: 'trade',
+            asset: type,
+            timestamp_str: new Date(dateStr + ' ' + timeStr).toLocaleString(),
+            focus_area: 'Imp',
+            notes: `${note}. Contract: ${fullAsset}`,
+            mistakes: [],
+            neg_notes: '',
+            plan_bias: '',
+            key_level: '',
+            plan_notes: '',
+            images: [],
+            entry_price: entry,
+            exit_price: exit,
+            lots: lots,
+            pnl: net.toFixed(2)
+        };
+    }
+
+    // --- P&L CALCULATOR (Manual) ---
+    function calculatePnL() {
+        const entry = parseFloat(document.getElementById('tradeEntry').value) || 0;
+        const exit = parseFloat(document.getElementById('tradeExit').value) || 0;
+        const lots = parseFloat(document.getElementById('tradeLots').value) || 1;
+        const qty = lots * 75; // Manual default
+        document.getElementById('tradeQtyDisp').innerText = qty;
+
+        if (entry > 0 && exit > 0) {
+            const gross = (exit - entry) * qty;
+            const net = gross - 45;
+            const pnlEl = document.getElementById('tradePnLDisplay');
+            pnlEl.innerText = (net >= 0 ? "+" : "") + net.toFixed(2);
+            pnlEl.className = net >= 0 ? "pnl-green" : "pnl-red";
+        }
+    }
+
+    // --- DATA OPS ---
+    const toLocalISO = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
     async function loadFromDB() {
         try {
             const res = await fetch('api.php?action=read');
@@ -318,8 +593,13 @@
                 id: parseInt(e.id),
                 mistakes: JSON.parse(e.mistakes || "[]"),
                 images: JSON.parse(e.images || "[]"),
-                type: e.entry_type 
+                type: e.entry_type,
+                entry_price: parseFloat(e.entry_price || 0),
+                exit_price: parseFloat(e.exit_price || 0),
+                lots: parseInt(e.lots || 0),
+                pnl: parseFloat(e.pnl || 0)
             }));
+            entries.sort((a, b) => b.id - a.id);
             renderEntries();
             updateFilterOptions();
         } catch (err) { console.error("Fetch Error:", err); }
@@ -328,32 +608,75 @@
     async function addEntry() {
         const typeSelect = document.getElementById('assetType').value;
         const assetName = (typeSelect === 'STOCK') ? document.getElementById('stockName').value : typeSelect;
+        
+        const dateInput = document.getElementById('entryTime').value;
+        const dateObj = dateInput ? new Date(dateInput) : new Date();
+        const finalId = editingId || dateObj.getTime();
+        const finalTimeStr = dateObj.toLocaleString();
+
+        let notes = "";
+        let entryPrice = 0, exitPrice = 0, lots = 0, pnl = 0;
+
+        if (currentMode === 'source') {
+            const rows = document.querySelectorAll('#resourceRows .dyn-row');
+            let data = [];
+            rows.forEach(r => {
+                const k = r.querySelector('.src-key').value;
+                const v = r.querySelector('.src-val').value;
+                if(k) data.push({k, v});
+            });
+            notes = JSON.stringify(data);
+        } else if (currentMode === 'trade') {
+            notes = document.getElementById('tradeLearning').value;
+            entryPrice = parseFloat(document.getElementById('tradeEntry').value) || 0;
+            exitPrice = parseFloat(document.getElementById('tradeExit').value) || 0;
+            lots = parseInt(document.getElementById('tradeLots').value) || 0;
+            pnl = parseFloat(document.getElementById('tradePnLDisplay').innerText) || 0;
+        } else {
+            notes = document.getElementById('liveNotes').value;
+        }
 
         const entryData = {
-            id: editingId || Date.now(),
+            id: finalId,
             entry_type: currentMode,
             asset: assetName,
-            timestamp_str: editingId ? entries.find(e => e.id === editingId).timestamp_str : new Date().toLocaleString(),
-            
-            // Live fields
+            timestamp_str: finalTimeStr,
             focus_area: document.getElementById('focusArea').value,
-            notes: document.getElementById('liveNotes').value,
-            
-            // EOD fields
+            notes: notes,
             mistakes: Array.from(document.querySelectorAll('.chip.selected')).map(c => c.innerText),
             neg_notes: document.getElementById('negativesNotes').value,
             plan_bias: document.getElementById('planBias').value,
             key_level: document.getElementById('keyLevel').value,
             plan_notes: document.getElementById('planNotes').value,
-            
-            images: currentImages
+            images: currentImages,
+            entry_price: entryPrice,
+            exit_price: exitPrice,
+            lots: lots,
+            pnl: pnl
         };
 
-        await fetch('api.php?action=save', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(entryData)
-        });
+       try {
+            const response = await fetch('api.php?action=save', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(entryData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                alert("Error saving data: " + result.error);
+                return; // Stop here if error
+            }
+            
+            // Only clear/reload if successful
+            editingId ? cancelEdit() : resetForms();
+            loadFromDB();
+            
+        } catch (e) {
+            alert("Network error: " + e);
+        }
+   
         
         editingId ? cancelEdit() : resetForms();
         loadFromDB();
@@ -366,26 +689,13 @@
         }
     }
 
-    // 2. LAYOUT LOGIC
-    function changeLayout(cols) {
-        currentLayout = cols;
-        const liveList = document.getElementById('liveList');
-        const eodList = document.getElementById('eodList');
-        liveList.classList.remove('layout-1', 'layout-2', 'layout-3');
-        eodList.classList.remove('layout-1', 'layout-2', 'layout-3');
-        liveList.classList.add(`layout-${cols}`);
-        eodList.classList.add(`layout-${cols}`);
-        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(`layout-${cols}`).classList.add('active');
-    }
-
-    // 3. FILTER & RENDER LOGIC
+    // --- UI RENDERING ---
     function renderEntries() {
-        // RESET GLOBAL GALLERY LIST
         globalGalleryImages = [];
-
         const liveList = document.getElementById('liveList');
+        const tradeList = document.getElementById('tradeList');
         const eodList = document.getElementById('eodList');
+        const sourceList = document.getElementById('sourceList');
         
         const assetF = document.getElementById('filterAsset').value;
         const areaF = document.getElementById('filterArea').value;
@@ -397,57 +707,40 @@
             const matchAsset = (assetF === 'ALL') || (assetF === 'STOCK' ? !['NIFTY','BTC'].includes(e.asset) : e.asset === assetF);
             const matchArea = (areaF === 'ALL') || (e.focus_area === areaF);
             const matchSearch = (e.notes && e.notes.toLowerCase().includes(searchF)) || (e.asset && e.asset.toLowerCase().includes(searchF));
-            
             let matchDate = true;
-            if (startF || endF) {
-                const entryDate = new Date(e.id);
-                entryDate.setHours(0,0,0,0); 
-                if (startF) {
-                    const startDate = new Date(startF + 'T00:00:00');
-                    if (entryDate < startDate) matchDate = false;
-                }
-                if (endF) {
-                    const endDate = new Date(endF + 'T00:00:00');
-                    if (entryDate > endDate) matchDate = false;
-                }
-            }
+            if (startF) { if (new Date(e.id) < new Date(startF).setHours(0,0,0,0)) matchDate = false; }
+            if (endF) { if (new Date(e.id) > new Date(endF).setHours(23,59,59,999)) matchDate = false; }
             return matchAsset && matchArea && matchSearch && matchDate;
         });
 
-        const liveEntries = filtered.filter(e => e.type === 'live');
-        const eodEntries = filtered.filter(e => e.type === 'eod');
-
-        // Helper to register images to global list
         const registerImage = (src, entry) => {
             const index = globalGalleryImages.length;
-            let title = entry.asset;
-            let sub = entry.timestamp_str.split(',')[1]?.trim().slice(0,5) || "";
-            if(entry.type === 'eod') sub = entry.timestamp_str.split(',')[0];
-            
-            globalGalleryImages.push({ 
-                src: src, 
-                desc: `${title} (${sub})`
-            });
+            globalGalleryImages.push({ src: src, desc: `${entry.asset}` });
             return index;
         };
 
-        liveList.innerHTML = liveEntries.map(e => {
-            let safeTime = "00:00";
-            if (e.timestamp_str && e.timestamp_str.includes(',')) {
-                safeTime = e.timestamp_str.split(',')[1].trim().slice(0,5);
-            } else if (e.timestamp_str) {
-                safeTime = e.timestamp_str.slice(-5);
-            }
+        const createDateHeader = (dateStr) => `<div class="date-header"><i class="far fa-calendar-alt"></i> ${dateStr}</div>`;
+        const getFriendlyDate = (timestamp) => {
+            const d = new Date(timestamp);
+            const today = new Date();
+            if(d.toDateString() === today.toDateString()) return "Today";
+            return d.toLocaleDateString(undefined, { weekday:'short', year:'numeric', month:'short', day:'numeric'});
+        };
 
-            // Map images and register them
-            const imagesHtml = e.images.map(img => {
-                const gIndex = registerImage(img, e);
-                return `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${gIndex})">`;
-            }).join('');
+        let dates = { live:'', trade:'', eod:'', source:'' };
 
-            return `
+        const checkDate = (listType, entry) => {
+            const d = getFriendlyDate(entry.id);
+            if(d !== dates[listType]) { dates[listType] = d; return createDateHeader(d); }
+            return '';
+        };
+
+        // Render LIVE
+        liveList.innerHTML = filtered.filter(e => e.type === 'live').map(e => {
+            const imagesHtml = e.images.map(img => `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${registerImage(img, e)})">`).join('');
+            return checkDate('live', e) + `
             <div class="live-card">
-                <div class="live-time">${safeTime}</div>
+                <div class="live-time">${new Date(e.id).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
                 <div class="live-content">
                     <div class="live-header">
                         <div style="font-weight:bold; color:var(--text-main);">${e.asset}</div>
@@ -456,217 +749,204 @@
                     <div style="color: #cbd5e1; font-size: 0.9rem;">${e.notes}</div>
                     <div class="entry-gallery">${imagesHtml}</div>
                     <div style="margin-top:5px; font-size:0.8rem; text-align:right;">
-                        <i class="fas fa-edit action-icon" onclick="editEntry(${e.id})" title="Edit"></i>
-                        <i class="fas fa-trash action-icon del" style="margin-left:10px;" onclick="deleteEntry(${e.id})" title="Delete"></i>
+                        <i class="fas fa-edit action-icon" onclick="editEntry(${e.id})"></i>
+                        <i class="fas fa-trash action-icon del" style="margin-left:10px;" onclick="deleteEntry(${e.id})"></i>
                     </div>
                 </div>
             </div>`;
         }).join('');
 
-        eodList.innerHTML = eodEntries.map(e => {
+        // Render TRADES
+        tradeList.innerHTML = filtered.filter(e => e.type === 'trade').map(e => {
+            const imagesHtml = e.images.map(img => `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${registerImage(img, e)})">`).join('');
+            const pnlClass = e.pnl >= 0 ? 'pnl-green' : 'pnl-red';
+            const sign = e.pnl >= 0 ? '+' : '';
+            return checkDate('trade', e) + `
+            <div class="trade-card">
+                <div class="trade-header">
+                    <div style="font-weight:bold;">${e.asset}</div>
+                    <div class="trade-pnl ${pnlClass}">${sign}${e.pnl}</div>
+                </div>
+                <div class="trade-body">
+                    <div class="trade-grid">
+                        <div class="trade-stat"><span class="ts-lbl">Entry</span><span class="ts-val">${e.entry_price}</span></div>
+                        <div class="trade-stat"><span class="ts-lbl">Exit</span><span class="ts-val">${e.exit_price}</span></div>
+                        <div class="trade-stat"><span class="ts-lbl">Lots</span><span class="ts-val">${e.lots}</span></div>
+                    </div>
+                    <div class="trade-learning">
+                        <div style="font-size:0.7rem; font-weight:bold; text-transform:uppercase; margin-bottom:3px; color:var(--danger);">Learning</div>
+                        ${e.notes}
+                    </div>
+                    <div class="entry-gallery">${imagesHtml}</div>
+                    <div class="action-bar" style="background:none; border:none; padding:0;">
+                        <i class="fas fa-edit action-icon" onclick="editEntry(${e.id})"></i>
+                        <i class="fas fa-trash action-icon del" onclick="deleteEntry(${e.id})"></i>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        // Render EOD
+        eodList.innerHTML = filtered.filter(e => e.type === 'eod').map(e => {
+            const imagesHtml = e.images.map(img => `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${registerImage(img, e)})">`).join('');
             const biasClass = e.plan_bias === 'Bullish' ? 'bias-bullish' : (e.plan_bias === 'Bearish' ? 'bias-bearish' : 'bias-neutral');
-            const mistakesHtml = e.mistakes.length > 0 
-                ? `<div class="mistake-row">${e.mistakes.map(m => `<span class="mistake-pill"><i class="fas fa-exclamation-circle"></i> ${m}</span>`).join('')}</div>`
-                : '';
-            
-            const safeDate = (e.timestamp_str && e.timestamp_str.includes(',')) 
-                ? e.timestamp_str.split(',')[0] 
-                : e.timestamp_str;
-
-             // Map images and register them
-             const imagesHtml = e.images.map(img => {
-                const gIndex = registerImage(img, e);
-                return `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${gIndex})">`;
-            }).join('');
-
-            return `
+            return checkDate('eod', e) + `
             <div class="eod-card">
                 <div class="eod-header">
                     <div class="asset-title ${biasClass}"><i class="fas fa-chart-bar"></i> ${e.asset}</div>
-                    <div class="date-badge">${safeDate}</div>
                 </div>
                 <div class="eod-body">
                     <div class="eod-meta">
-                        <div class="stat-box ${biasClass}" style="border-left: 3px solid currentColor;">
-                            <span class="stat-label">Bias</span>
-                            <span class="stat-value">${e.plan_bias}</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="stat-label">Key Level</span>
-                            <span class="stat-value" style="font-family:monospace; color:var(--cyan);">${e.key_level || '-'}</span>
-                        </div>
+                        <div class="stat-box ${biasClass}" style="border-left: 3px solid currentColor;"><span class="stat-label">Bias</span><span class="stat-value">${e.plan_bias}</span></div>
+                        <div class="stat-box"><span class="stat-label">Key Level</span><span class="stat-value" style="font-family:monospace; color:var(--cyan);">${e.key_level || '-'}</span></div>
                     </div>
                     <div class="eod-analysis">
-                        ${mistakesHtml}
-                        <div class="detail-text">${e.neg_notes || '<span style="color:gray; font-style:italic">No mistake details...</span>'}</div>
+                        <div class="detail-text">${e.neg_notes}</div>
                         <div class="plan-text">Plan: ${e.plan_notes}</div>
                         <div class="entry-gallery">${imagesHtml}</div>
                     </div>
                 </div>
-                <div class="action-bar">
-                    <i class="fas fa-edit action-icon" onclick="editEntry(${e.id})"></i>
-                    <i class="fas fa-trash action-icon del" onclick="deleteEntry(${e.id})"></i>
+                <div class="action-bar"><i class="fas fa-edit action-icon" onclick="editEntry(${e.id})"></i><i class="fas fa-trash action-icon del" onclick="deleteEntry(${e.id})"></i></div>
+            </div>`;
+        }).join('');
+
+        // Render RESOURCES
+        sourceList.innerHTML = filtered.filter(e => e.type === 'source').map(e => {
+            const imagesHtml = e.images.map(img => `<img src="${img}" class="entry-img" onclick="openGlobalGallery(${registerImage(img, e)})">`).join('');
+            let data = []; try { data = JSON.parse(e.notes || "[]"); } catch(er){ data = []; }
+            const fields = data.map(f => `<div class="resource-item"><span class="resource-label">${f.k}</span><span class="resource-val">${f.v}</span></div>`).join('');
+            return checkDate('source', e) + `
+            <div class="resource-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <div style="font-weight:bold; color:var(--cyan);"><i class="fas fa-globe"></i> ${e.asset} Resource</div>
                 </div>
+                <div style="display:flex; flex-direction:column; gap:8px; flex:1;">${fields}</div>
+                <div class="entry-gallery">${imagesHtml}</div>
+                <div class="action-bar" style="background:none; border:none; padding:0; margin-top:10px;"><i class="fas fa-edit action-icon" onclick="editEntry(${e.id})"></i><i class="fas fa-trash action-icon del" onclick="deleteEntry(${e.id})"></i></div>
             </div>`;
         }).join('');
     }
 
-    // --- GLOBAL GALLERY LOGIC ---
-    function openGlobalGallery(index) {
-        if(index < 0 || index >= globalGalleryImages.length) return;
-        currentGalleryIndex = index;
-        updateGalleryView();
-        document.getElementById('imgModal').style.display = 'flex';
-    }
-
-    function updateGalleryView() {
-        const item = globalGalleryImages[currentGalleryIndex];
-        document.getElementById('modalImg').src = item.src;
-        document.getElementById('modalDesc').innerText = item.desc;
-        
-        // Hide/Show Navigation buttons based on total image count
-        const display = globalGalleryImages.length > 1 ? 'flex' : 'none';
-        document.querySelectorAll('.modal-nav').forEach(btn => btn.style.display = display);
-        
-        document.getElementById('modalCounter').innerText = `${currentGalleryIndex + 1} / ${globalGalleryImages.length}`;
-    }
-
-    function moveGallery(step) {
-        currentGalleryIndex += step;
-        // Loop Logic
-        if (currentGalleryIndex >= globalGalleryImages.length) currentGalleryIndex = 0;
-        if (currentGalleryIndex < 0) currentGalleryIndex = globalGalleryImages.length - 1;
-        updateGalleryView();
-    }
-
-    function closeGallery() {
-        document.getElementById('imgModal').style.display = 'none';
-    }
-
-    // Keyboard support for Gallery
-    document.addEventListener('keydown', (e) => {
-        if(document.getElementById('imgModal').style.display === 'flex') {
-            if(e.key === 'ArrowLeft') moveGallery(-1);
-            if(e.key === 'ArrowRight') moveGallery(1);
-            if(e.key === 'Escape') closeGallery();
-        }
-    });
-
-    // 4. UI HELPERS
-    function updateFilterOptions() {
-        const areaSelect = document.getElementById('filterArea');
-        areaSelect.innerHTML = '<option value="ALL">All Categories</option>' + 
-            focusAreas.map(a => `<option value="${a}">${a}</option>`).join('');
+    // --- HELPERS & MODALS ---
+    function changeLayout(cols) {
+        currentLayout = cols;
+        ['liveList', 'tradeList', 'eodList', 'sourceList'].forEach(id => {
+            document.getElementById(id).className = `feed-grid layout-${cols}`;
+        });
+        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`layout-${cols}`).classList.add('active');
     }
 
     function switchMode(mode) {
         currentMode = mode;
-        document.getElementById('formLive').style.display = mode === 'live' ? 'block' : 'none';
-        document.getElementById('formEOD').style.display = mode === 'eod' ? 'block' : 'none';
-        document.getElementById('tabLive').className = mode === 'live' ? 'mode-tab active' : 'mode-tab';
-        document.getElementById('tabEOD').className = mode === 'eod' ? 'mode-tab active-eod' : 'mode-tab';
+        ['Live', 'Trade', 'EOD', 'Source'].forEach(m => {
+            const isMatch = mode.toLowerCase() === m.toLowerCase();
+            document.getElementById('form'+m).style.display = isMatch ? 'block' : 'none';
+            const tabEl = document.getElementById('tab'+m);
+            tabEl.className = 'mode-tab';
+            if(isMatch) {
+                if(m === 'EOD') tabEl.classList.add('active-eod');
+                else if(m === 'Source') tabEl.classList.add('active-cyan');
+                else if(m === 'Trade') tabEl.classList.add('active-green');
+                else tabEl.classList.add('active');
+            }
+        });
     }
 
     function switchRightTab(t) {
-        document.querySelectorAll('.rt-tab').forEach(el => el.classList.remove('active', 'active-purple'));
-        document.getElementById('rt-'+t).classList.add(t=='eod'?'active-purple':'active');
-        document.getElementById('view-live').style.display = t === 'live' ? 'block' : 'none';
-        document.getElementById('view-eod').style.display = t === 'eod' ? 'block' : 'none';
+        ['live', 'trade', 'eod', 'source'].forEach(tab => {
+            const isMatch = tab === t;
+            document.getElementById('view-'+tab).style.display = isMatch ? 'block' : 'none';
+            const rtEl = document.getElementById('rt-'+tab);
+            rtEl.className = 'rt-tab';
+            if(isMatch) {
+                if(tab === 'eod') rtEl.classList.add('active-purple');
+                else if(tab === 'source') rtEl.classList.add('active-cyan');
+                else if(tab === 'trade') rtEl.classList.add('active-green');
+                else rtEl.classList.add('active');
+            }
+        });
     }
 
-    function toggleAssetInput() {
-        const type = document.getElementById('assetType').value;
-        document.getElementById('stockNameContainer').style.display = (type === 'STOCK') ? 'block' : 'none';
-    }
-
+    function toggleAssetInput() { document.getElementById('stockNameContainer').style.display = (document.getElementById('assetType').value === 'STOCK') ? 'block' : 'none'; }
     function toggleChip(chip) { chip.classList.toggle('selected'); }
-
-    function resetForms() {
-        document.querySelectorAll('input, textarea').forEach(i => i.value = '');
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-        currentImages = []; document.getElementById('previewContainer').innerHTML = '';
-        editingId = null;
-        document.getElementById('btnCancel').style.display = 'none';
-        document.getElementById('btnSubmit').innerText = "Add Entry";
-    }
+    function updateFilterOptions() { document.getElementById('filterArea').innerHTML = '<option value="ALL">All Categories</option>' + focusAreas.map(a => `<option value="${a}">${a}</option>`).join(''); }
     
-    function cancelEdit() {
-        resetForms();
-    }
-
     function editEntry(id) {
         const e = entries.find(x => x.id === id);
         if(!e) return;
-        
         editingId = id;
         switchMode(e.type);
         document.getElementById('btnSubmit').innerText = "Update Entry";
         document.getElementById('btnCancel').style.display = 'block';
+        document.getElementById('entryTime').value = toLocalISO(new Date(e.id));
         
         const isStandard = ['NIFTY','BTC'].includes(e.asset);
         document.getElementById('assetType').value = isStandard ? e.asset : 'STOCK';
         document.getElementById('stockName').value = isStandard ? '' : e.asset;
         toggleAssetInput();
 
-        if(e.type === 'live') {
+        if(e.type === 'trade') {
+            document.getElementById('tradeEntry').value = e.entry_price;
+            document.getElementById('tradeExit').value = e.exit_price;
+            document.getElementById('tradeLots').value = e.lots;
+            document.getElementById('tradeLearning').value = e.notes;
+            calculatePnL(); 
+        } else if(e.type === 'live') {
             document.getElementById('liveNotes').value = e.notes;
             document.getElementById('focusArea').value = e.focus_area;
-        } else {
+        } else if(e.type === 'eod') {
             document.getElementById('negativesNotes').value = e.neg_notes;
             document.getElementById('planNotes').value = e.plan_notes;
             document.getElementById('keyLevel').value = e.key_level;
             document.getElementById('planBias').value = e.plan_bias;
-
-            document.querySelectorAll('.chip').forEach(c => {
-                c.classList.remove('selected');
-                if(e.mistakes && e.mistakes.includes(c.innerText)) {
-                    c.classList.add('selected');
-                }
-            });
+        } else if(e.type === 'source') {
+            document.getElementById('resourceRows').innerHTML = '';
+            try { JSON.parse(e.notes || "[]").forEach(d => addResourceRow(d.k, d.v)); } catch(er) { addResourceRow(); }
         }
         currentImages = e.images;
         renderPreviews();
     }
 
-    document.getElementById('fileInput').onchange = (e) => {
-        Array.from(e.target.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (ev) => { currentImages.push(ev.target.result); renderPreviews(); };
-            reader.readAsDataURL(file);
-        });
-    };
-
-    function renderPreviews() {
-        document.getElementById('previewContainer').innerHTML = currentImages.map((img, i) => `
-            <div style="position:relative;"><img src="${img}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">
-            <button onclick="currentImages.splice(${i},1);renderPreviews()" style="position:absolute;top:0;right:0;padding:2px;background:red;font-size:10px;">X</button></div>
-        `).join('');
+    function resetForms() {
+        document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+        document.getElementById('tradeLots').value = '1';
+        document.getElementById('tradePnLDisplay').innerText = '0.00';
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        document.getElementById('resourceRows').innerHTML = '<div class="dyn-row"><input type="text" class="src-key" placeholder="Source"><input type="text" class="src-val" placeholder="Info/Quote"></div>';
+        currentImages = []; document.getElementById('previewContainer').innerHTML = '';
+        editingId = null; document.getElementById('btnCancel').style.display = 'none'; document.getElementById('btnSubmit').innerText = "Add Entry";
+        document.getElementById('entryTime').value = toLocalISO(new Date());
     }
-
-    function openTagManager() {
-        document.getElementById('tagListDisplay').innerHTML = focusAreas.map((a,i) => `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #334155;">${a} <i class="fas fa-trash" onclick="focusAreas.splice(${i},1);openTagManager();renderFocusOptions();updateFilterOptions();"></i></div>`).join('');
-        document.getElementById('tagModal').style.display = 'flex';
-    }
-
-    function addNewTag() {
-        const v = document.getElementById('newTagInput').value;
-        if(v) { focusAreas.push(v); localStorage.setItem('journalFocusAreas', JSON.stringify(focusAreas)); renderFocusOptions(); updateFilterOptions(); openTagManager(); }
-    }
-
-    function renderFocusOptions() { document.getElementById('focusArea').innerHTML = focusAreas.map(a=>`<option value="${a}">${a}</option>`).join(''); }
     
-    function clearData() { if(confirm("Delete ALL entries?")) { entries.forEach(async e => await fetch(`api.php?action=delete&id=${e.id}`)); loadFromDB(); } }
+    function cancelEdit() { resetForms(); }
 
-    function downloadSql() {
-        let sql = "INSERT INTO journal_entries (...) VALUES ..."; 
-        const blob = new Blob([sql], {type: 'application/sql'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = "export.sql";
-        a.click();
-    }
+    // --- GALLERY, CHECKLIST, TAGS ---
+    function openGlobalGallery(index) { currentGalleryIndex = index; updateGalleryView(); document.getElementById('imgModal').style.display = 'flex'; }
+    function updateGalleryView() { const item = globalGalleryImages[currentGalleryIndex]; document.getElementById('modalImg').src = item.src; document.getElementById('modalDesc').innerText = item.desc; document.getElementById('modalCounter').innerText = `${currentGalleryIndex + 1} / ${globalGalleryImages.length}`; }
+    function moveGallery(step) { currentGalleryIndex += step; if (currentGalleryIndex >= globalGalleryImages.length) currentGalleryIndex = 0; if (currentGalleryIndex < 0) currentGalleryIndex = globalGalleryImages.length - 1; updateGalleryView(); }
+    function closeGallery() { document.getElementById('imgModal').style.display = 'none'; }
+    
+    async function openChecklist() { loadChecklistData(); document.getElementById('checklistModal').style.display = 'flex'; }
+    async function loadChecklistData() { try { const res = await fetch('api.php?action=checklist_read'); checklistRules = await res.json(); renderChecklist(); } catch(e){} }
+    function renderChecklist() { document.getElementById('checklistItemsContainer').innerHTML = checklistRules.map(r => `<div class="checklist-item ${r.checked?'checked':''}" onclick="toggleCheckRule(${r.id})"><div class="checklist-checkbox"></div><span class="cl-text">${r.text}</span><i class="fas fa-trash" onclick="event.stopPropagation();deleteCheckRule(${r.id})"></i></div>`).join(''); }
+    async function toggleCheckRule(id) { await fetch(`api.php?action=checklist_toggle&id=${id}`); loadChecklistData(); }
+    async function addChecklistItem() { const val = document.getElementById('newChecklistInput').value.trim(); if(val) { await fetch('api.php?action=checklist_add', {method:'POST',body:JSON.stringify({text:val})}); document.getElementById('newChecklistInput').value=''; loadChecklistData(); } }
+    async function deleteCheckRule(id) { if(confirm("Remove?")) { await fetch(`api.php?action=checklist_delete&id=${id}`); loadChecklistData(); } }
+    async function resetChecklist() { await fetch('api.php?action=checklist_reset'); loadChecklistData(); }
+
+    function addResourceRow(key='', val='') { document.getElementById('resourceRows').insertAdjacentHTML('beforeend', `<div class="dyn-row"><input type="text" class="src-key" value="${key}" placeholder="Source"><input type="text" class="src-val" value="${val}" placeholder="Info..."><div class="dyn-del" onclick="this.parentElement.remove()">&times;</div></div>`); }
+    function openTagManager() { document.getElementById('tagListDisplay').innerHTML = focusAreas.map((a,i) => `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #334155;">${a} <i class="fas fa-trash" onclick="focusAreas.splice(${i},1);openTagManager();renderFocusOptions();"></i></div>`).join(''); document.getElementById('tagModal').style.display = 'flex'; }
+    function addNewTag() { const v = document.getElementById('newTagInput').value; if(v) { focusAreas.push(v); localStorage.setItem('journalFocusAreas', JSON.stringify(focusAreas)); renderFocusOptions(); openTagManager(); } }
+    function renderFocusOptions() { document.getElementById('focusArea').innerHTML = focusAreas.map(a=>`<option value="${a}">${a}</option>`).join(''); }
+    function clearData() { if(confirm("Delete ALL?")) entries.forEach(e => fetch(`api.php?action=delete&id=${e.id}`)); location.reload(); }
+    function downloadSql() { const blob = new Blob(["INSERT..."], {type: 'application/sql'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "export.sql"; a.click(); }
+    document.getElementById('fileInput').onchange = (e) => { Array.from(e.target.files).forEach(f => { const r = new FileReader(); r.onload = (ev) => { currentImages.push(ev.target.result); renderPreviews(); }; r.readAsDataURL(f); }); };
+    function renderPreviews() { document.getElementById('previewContainer').innerHTML = currentImages.map((img,i) => `<div style="position:relative;"><img src="${img}" style="width:50px;height:50px;"><button onclick="currentImages.splice(${i},1);renderPreviews()" style="position:absolute;top:0;right:0;background:red;">X</button></div>`).join(''); }
 
     // Init
+    document.getElementById('entryTime').value = toLocalISO(new Date());
+    document.getElementById('importDate').value = new Date().toISOString().slice(0,10);
     renderFocusOptions();
     loadFromDB();
 </script>
